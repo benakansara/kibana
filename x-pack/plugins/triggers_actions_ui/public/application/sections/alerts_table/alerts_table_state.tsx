@@ -63,6 +63,9 @@ export type AlertsTableStateProps = {
   id: string;
   featureIds: ValidFeatureId[];
   query: Pick<QueryDslQueryContainer, 'bool' | 'ids'>;
+  alertGroupFilter?: Array<{
+    term: { [x: string]: string | undefined };
+  }>;
   pageSize?: number;
   browserFields?: BrowserFields;
   onUpdate?: (args: TableUpdateHandlerArgs) => void;
@@ -140,6 +143,7 @@ const AlertsTableStateWithQueryProvider = ({
   id,
   featureIds,
   query,
+  alertGroupFilter,
   pageSize,
   leadingControlColumns,
   rowHeightsOptions,
@@ -247,6 +251,7 @@ const AlertsTableStateWithQueryProvider = ({
     fields,
     featureIds,
     query,
+    alertGroupFilter,
     pagination,
     onPageChange,
     onLoaded,

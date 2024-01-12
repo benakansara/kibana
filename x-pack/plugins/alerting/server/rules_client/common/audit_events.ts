@@ -34,6 +34,7 @@ export enum RuleAuditAction {
   UNSNOOZE = 'rule_unsnooze',
   RUN_SOON = 'rule_run_soon',
   UNTRACK_ALERT = 'rule_alert_untrack',
+  GET_ALERT_GROUPS = 'get_alert_groups',
 }
 
 type VerbsTuple = [string, string, string];
@@ -83,6 +84,7 @@ const eventVerbs: Record<RuleAuditAction, VerbsTuple> = {
     'accessed global execution KPI for',
   ],
   rule_alert_untrack: ['untrack', 'untracking', 'untracked'],
+  get_alert_groups: ['access', 'accessing', 'accessed'],
 };
 
 const eventTypes: Record<RuleAuditAction, ArrayElement<EcsEvent['type']>> = {
@@ -110,6 +112,7 @@ const eventTypes: Record<RuleAuditAction, ArrayElement<EcsEvent['type']>> = {
   rule_get_execution_kpi: 'access',
   rule_get_global_execution_kpi: 'access',
   rule_alert_untrack: 'change',
+  get_alert_groups: 'access',
 };
 
 export interface RuleAuditEventParams {

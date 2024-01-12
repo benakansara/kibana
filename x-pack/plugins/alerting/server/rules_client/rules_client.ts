@@ -69,6 +69,7 @@ import {
   bulkUntrackAlerts,
   BulkUntrackBody,
 } from '../application/rule/methods/bulk_untrack/bulk_untrack_alerts';
+import { getAlertGroups } from '../application/rule/methods/alert_groups/get_alert_groups';
 
 export type ConstructorOptions = Omit<
   RulesClientContext,
@@ -176,6 +177,7 @@ export class RulesClient {
   public unmuteInstance = (options: MuteAlertParams) => unmuteInstance(this.context, options);
 
   public bulkUntrackAlerts = (options: BulkUntrackBody) => bulkUntrackAlerts(this.context, options);
+  public getAlertGroups = () => getAlertGroups(this.context);
 
   public runSoon = (options: { id: string }) => runSoon(this.context, options);
 

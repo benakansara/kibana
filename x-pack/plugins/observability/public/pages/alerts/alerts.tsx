@@ -5,9 +5,17 @@
  * 2.0.
  */
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { BrushEndListener, XYBrushEvent } from '@elastic/charts';
-import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import {
+  EuiAccordion,
+  EuiComboBox,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiText,
+  EuiTextColor,
+  EuiTitle,
+} from '@elastic/eui';
 import { BoolQuery } from '@kbn/es-query';
 import { i18n } from '@kbn/i18n';
 import { loadRuleAggregations } from '@kbn/triggers-actions-ui-plugin/public';
@@ -35,6 +43,7 @@ import { getAlertSummaryTimeRange } from '../../utils/alert_summary_widget';
 import { observabilityAlertFeatureIds } from '../../../common/constants';
 import { ALERTS_URL_STORAGE_KEY } from '../../../common/constants';
 import { HeaderMenu } from '../overview/components/header_menu/header_menu';
+import { useFetchAlertGroups } from '../../hooks/use_fetch_alert_groups';
 
 const ALERTS_SEARCH_BAR_ID = 'alerts-search-bar-o11y';
 const ALERTS_PER_PAGE = 50;
@@ -42,6 +51,10 @@ const ALERTS_TABLE_ID = 'xpack.observability.alerts.alert.table';
 
 const DEFAULT_INTERVAL = '60s';
 const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD HH:mm';
+
+interface AlertGroup {
+  [x: string]: string | undefined;
+}
 
 function InternalAlertsPage() {
   const kibanaServices = useKibana().services;
@@ -170,6 +183,56 @@ function InternalAlertsPage() {
 
   const manageRulesHref = http.basePath.prepend('/app/observability/alerts/rules');
 
+  const [alertGroupKeys, setAlertGroupKeys] = useState<string[]>([]);
+  const [alertGroups, setAlertGroups] = useState<AlertGroup[]>([]);
+  const { data: alertGroupsResult } = useFetchAlertGroups();
+
+  const getAlertGroups = useCallback(() => {
+    if (!alertGroupsResult) return;
+
+    const processedAlertGroupKeys: string[] = ['None'];
+    const processedAlertGroups: AlertGroup[] = [];
+
+    (alertGroupsResult as any).forEach((group: any) => {
+      Object.keys(group).forEach((groupKey) => {
+        group[groupKey].forEach((subGroup: any) => {
+          if (!processedAlertGroupKeys.includes(subGroup.field)) {
+            processedAlertGroupKeys.push(subGroup.field);
+          }
+
+          const newGroup = { [subGroup.field]: subGroup.value };
+          if (
+            processedAlertGroups.findIndex((item) => item[subGroup.field] === subGroup.value) === -1
+          ) {
+            processedAlertGroups.push(newGroup);
+          }
+        });
+      });
+    });
+
+    setAlertGroupKeys(processedAlertGroupKeys);
+    setAlertGroups(processedAlertGroups);
+  }, [alertGroupsResult]);
+
+  useEffect(() => {
+    getAlertGroups();
+  }, [getAlertGroups]);
+
+  const [selectedGroupKey, setSelectedGroupKey] = useState<string>('None');
+  const [selectedOptions, setSelected] = useState<any[]>([{ label: 'None' }]);
+
+  const onChange = (selectedGroupByOptions: any[]) => {
+    setSelected(selectedGroupByOptions);
+    setSelectedGroupKey(selectedGroupByOptions[0].label);
+  };
+
+  const filterAlertGroups = (groupKey: string = '') => {
+    if (groupKey === '') return alertGroups;
+    return alertGroups.filter((group) => {
+      return Object.keys(group)[0] === groupKey;
+    });
+  };
+
   return (
     <Provider value={alertSearchBarStateContainer}>
       <ObservabilityPageTemplate
@@ -212,17 +275,81 @@ function InternalAlertsPage() {
             />
           </EuiFlexItem>
           <EuiFlexItem>
-            {esQuery && (
-              <AlertsStateTable
-                alertsTableConfigurationRegistry={alertsTableConfigurationRegistry}
-                configurationId={AlertConsumers.OBSERVABILITY}
-                id={ALERTS_TABLE_ID}
-                featureIds={observabilityAlertFeatureIds}
-                query={esQuery}
-                showAlertStatusWithFlapping
-                pageSize={ALERTS_PER_PAGE}
-              />
-            )}
+            <EuiFlexGroup direction="column" alignItems="flexEnd">
+              <EuiFlexItem grow={false}>
+                <EuiComboBox
+                  placeholder="Select field to group alerts by"
+                  options={alertGroupKeys.map((key) => {
+                    return { label: key };
+                  })}
+                  onChange={onChange}
+                  isClearable={true}
+                  prepend="Group Alerts By"
+                  singleSelection={{ asPlainText: true }}
+                  selectedOptions={selectedOptions}
+                  style={{ width: '400px' }}
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            {esQuery &&
+              (selectedGroupKey === 'None' ? (
+                <AlertsStateTable
+                  alertsTableConfigurationRegistry={alertsTableConfigurationRegistry}
+                  configurationId={AlertConsumers.OBSERVABILITY}
+                  id={ALERTS_TABLE_ID}
+                  key={ALERTS_TABLE_ID}
+                  featureIds={observabilityAlertFeatureIds}
+                  query={esQuery}
+                  showAlertStatusWithFlapping
+                  pageSize={ALERTS_PER_PAGE}
+                />
+              ) : (
+                filterAlertGroups(selectedGroupKey).map((alertGroup: any, index: number) => {
+                  return (
+                    <EuiAccordion
+                      id={`alert-group-accordion-${index}`}
+                      key={`alert-group-accordion-${index}`}
+                      buttonContent={
+                        <div>
+                          <EuiFlexGroup gutterSize="s" alignItems="center" responsive={false}>
+                            <EuiFlexItem>
+                              <EuiTitle size="xs">
+                                <h3>{Object.values(alertGroup || {}).join(', ')}</h3>
+                              </EuiTitle>
+                            </EuiFlexItem>
+                          </EuiFlexGroup>
+
+                          <EuiText size="s">
+                            <p>
+                              <EuiTextColor color="subdued">
+                                {Object.keys(alertGroup || {}).join(', ')}
+                              </EuiTextColor>
+                            </p>
+                          </EuiText>
+                        </div>
+                      }
+                      element="fieldset"
+                      paddingSize="s"
+                      borders="horizontal"
+                      buttonProps={{ paddingSize: 'm' }}
+                    >
+                      <AlertsStateTable
+                        alertsTableConfigurationRegistry={alertsTableConfigurationRegistry}
+                        configurationId={AlertConsumers.OBSERVABILITY}
+                        id={`${ALERTS_TABLE_ID}-${index}`}
+                        key={`${ALERTS_TABLE_ID}-${index}`}
+                        featureIds={observabilityAlertFeatureIds}
+                        query={esQuery}
+                        alertGroupFilter={[{ term: alertGroup }]}
+                        showAlertStatusWithFlapping
+                        pageSize={ALERTS_PER_PAGE}
+                      />
+                    </EuiAccordion>
+                  );
+                })
+              ))}
           </EuiFlexItem>
         </EuiFlexGroup>
       </ObservabilityPageTemplate>

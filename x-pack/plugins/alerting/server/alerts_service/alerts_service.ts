@@ -46,6 +46,7 @@ import type { LegacyAlertsClientParams, AlertRuleData } from '../alerts_client';
 import { AlertsClient } from '../alerts_client';
 import { IAlertsClient } from '../alerts_client/types';
 import { setAlertsToUntracked, SetAlertsToUntrackedOpts } from './lib/set_alerts_to_untracked';
+import { getAlertGroups } from './lib/get_alert_groups';
 
 export const TOTAL_FIELDS_LIMIT = 2500;
 const LEGACY_ALERT_CONTEXT = 'legacy-alert';
@@ -471,6 +472,13 @@ export class AlertsService implements IAlertsService {
       logger: this.options.logger,
       esClient: await this.options.elasticsearchClientPromise,
       ...opts,
+    });
+  }
+
+  public async getAlertGroups() {
+    return getAlertGroups({
+      logger: this.options.logger,
+      esClient: await this.options.elasticsearchClientPromise,
     });
   }
 }

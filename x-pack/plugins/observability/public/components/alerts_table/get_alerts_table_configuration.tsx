@@ -15,7 +15,6 @@ import {
 import { casesFeatureId, observabilityFeatureId } from '../../../common';
 import { getRenderCellValue } from './render_cell_value';
 import { columns } from './default_columns';
-import { AlertActions } from '../../pages/alerts/components/alert_actions';
 import { useGetAlertFlyoutComponents } from '../alerts_flyout/use_get_alert_flyout_components';
 import type { ObservabilityRuleTypeRegistry } from '../../rules/create_observability_rule_type_registry';
 import type { ConfigSchema } from '../../plugin';
@@ -42,11 +41,12 @@ export const getAlertsTableConfiguration = (
   useActionsColumn: () => ({
     renderCustomActionsRow: (props: RenderCustomActionsRowArgs) => {
       return (
-        <AlertActions
-          {...props}
-          config={config}
-          observabilityRuleTypeRegistry={observabilityRuleTypeRegistry}
-        />
+        <></>
+        // <AlertActions
+        //   {...props}
+        //   config={config}
+        //   observabilityRuleTypeRegistry={observabilityRuleTypeRegistry}
+        // />
       );
     },
   }),

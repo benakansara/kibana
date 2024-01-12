@@ -32,6 +32,9 @@ export interface FetchAlertsArgs {
   featureIds: ValidFeatureId[];
   fields: QueryDslFieldAndFormat[];
   query: Pick<QueryDslQueryContainer, 'bool' | 'ids'>;
+  alertGroupFilter?: Array<{
+    term: { [x: string]: string | undefined };
+  }>;
   pagination: {
     pageIndex: number;
     pageSize: number;
@@ -147,6 +150,7 @@ export type UseFetchAlerts = ({
   featureIds,
   fields,
   query,
+  alertGroupFilter,
   pagination,
   onLoaded,
   onPageChange,
@@ -158,6 +162,7 @@ const useFetchAlerts = ({
   featureIds,
   fields,
   query,
+  alertGroupFilter,
   pagination,
   onLoaded,
   onPageChange,
@@ -196,12 +201,25 @@ const useFetchAlerts = ({
 
       const asyncSearch = async () => {
         prevAlertRequest.current = request;
+
+        const newQuery = alertGroupFilter
+          ? ({
+              ...query,
+              bool: {
+                ...query.bool,
+                filter: [...(query.bool?.filter as QueryDslQueryContainer[]), ...alertGroupFilter],
+              },
+            } as QueryDslQueryContainer)
+          : undefined;
+
+        // console.log("newQuery====>", JSON.stringify(newQuery, null, 4));
+
         abortCtrl.current = new AbortController();
         dispatch({ type: 'loading', loading: true });
         if (data && data.search) {
           searchSubscription$.current = data.search
             .search<RuleRegistrySearchRequest, RuleRegistrySearchResponse>(
-              { ...request, featureIds, fields, query },
+              { ...request, featureIds, fields, query: newQuery ? newQuery : query },
               {
                 strategy: 'privateRuleRegistryAlertsSearchStrategy',
                 abortSignal: abortCtrl.current.signal,
@@ -281,7 +299,7 @@ const useFetchAlerts = ({
       asyncSearch();
       refetch.current = asyncSearch;
     },
-    [skip, data, featureIds, query, fields, onLoaded]
+    [skip, data, featureIds, query, fields, onLoaded, alertGroupFilter]
   );
 
   // FUTURE ENGINEER

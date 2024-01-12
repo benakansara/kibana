@@ -64,6 +64,7 @@ import { bulkGetMaintenanceWindowRoute } from './maintenance_window/apis/bulk_ge
 import { registerAlertsValueSuggestionsRoute } from './suggestions/values_suggestion_alerts';
 import { getQueryDelaySettingsRoute } from './rules_settings/apis/get/get_query_delay_settings';
 import { updateQueryDelaySettingsRoute } from './rules_settings/apis/update/update_query_delay_settings';
+import { getAlertGroupsAlertRoute } from './rule/apis/alert_groups/get_alert_groups_route';
 
 export interface RouteOptions {
   router: IRouter<AlertingRequestHandlerContext>;
@@ -137,4 +138,5 @@ export function defineRoutes(opts: RouteOptions) {
   bulkUntrackAlertRoute(router, licenseState);
   getQueryDelaySettingsRoute(router, licenseState);
   updateQueryDelaySettingsRoute(router, licenseState);
+  getAlertGroupsAlertRoute(router, licenseState);
 }
