@@ -13,7 +13,7 @@ import { transformRule } from './common_transformations';
 
 type RuleUpdatesBody = Pick<
   RuleUpdates,
-  'name' | 'tags' | 'schedule' | 'actions' | 'params' | 'throttle' | 'notifyWhen'
+  'name' | 'tags' | 'schedule' | 'actions' | 'params' | 'throttle' | 'notifyWhen' | 'dashboards'
 >;
 const rewriteBodyRequest: RewriteResponseCase<RuleUpdatesBody> = ({ actions, ...res }): any => ({
   ...res,
@@ -42,14 +42,16 @@ export async function updateRule({
   id,
 }: {
   http: HttpSetup;
-  rule: Pick<RuleUpdates, 'name' | 'tags' | 'schedule' | 'params' | 'actions'>;
+  rule: Pick<RuleUpdates, 'name' | 'tags' | 'schedule' | 'params' | 'actions' | 'dashboards'>;
   id: string;
 }): Promise<Rule> {
   const res = await http.put<AsApiContract<Rule>>(
     `${BASE_ALERTING_API_PATH}/rule/${encodeURIComponent(id)}`,
     {
       body: JSON.stringify(
-        rewriteBodyRequest(pick(rule, ['name', 'tags', 'schedule', 'params', 'actions']))
+        rewriteBodyRequest(
+          pick(rule, ['name', 'tags', 'schedule', 'params', 'actions', 'dashboards'])
+        )
       ),
     }
   );

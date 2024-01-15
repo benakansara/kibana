@@ -174,6 +174,7 @@ export const transformRuleAttributesToRuleDomain = <Params extends RuleParams = 
     enabled: esRule.enabled,
     name: esRule.name,
     tags: esRule.tags,
+    dashboards: esRule.dashboards,
     alertTypeId: esRule.alertTypeId,
     consumer: esRule.consumer,
     schedule: esRule.schedule,

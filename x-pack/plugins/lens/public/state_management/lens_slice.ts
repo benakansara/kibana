@@ -1056,6 +1056,7 @@ export const makeLensReducer = (storeDeps: LensStoreDeps) => {
       const currentDataViewsId = activeDatasource.getUsedDataView(
         state.datasourceStates[state.activeDatasourceId!].state
       );
+
       const visualizationState = activeVisualization.appendLayer!(
         state.visualization.state,
         layerId,

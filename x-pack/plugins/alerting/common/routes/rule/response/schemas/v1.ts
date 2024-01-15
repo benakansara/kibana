@@ -187,6 +187,9 @@ export const ruleResponseSchema = schema.object({
   enabled: schema.boolean(),
   name: schema.string(),
   tags: schema.arrayOf(schema.string()),
+  dashboards: schema.maybe(
+    schema.arrayOf(schema.object({ id: schema.string(), title: schema.string() }))
+  ),
   rule_type_id: schema.string(),
   consumer: schema.string(),
   schedule: intervalScheduleSchema,

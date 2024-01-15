@@ -218,6 +218,9 @@ export const rawRuleSchema = schema.object({
   enabled: schema.boolean(),
   consumer: schema.string(),
   tags: schema.arrayOf(schema.string()),
+  dashboards: schema.maybe(
+    schema.arrayOf(schema.object({ id: schema.string(), title: schema.string() }))
+  ),
   alertTypeId: schema.string(),
   apiKeyOwner: schema.nullable(schema.string()),
   apiKey: schema.nullable(schema.string()),

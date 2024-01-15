@@ -17,6 +17,7 @@ export interface AlertSummary {
   id: string;
   name: string;
   tags: string[];
+  dashboards?: Array<{ id: string; title: string }>;
   ruleTypeId: string;
   consumer: string;
   muteAll: boolean;

@@ -47,6 +47,7 @@ export interface AlertRuleData {
   revision: number;
   spaceId: string;
   tags: string[];
+  dashboards?: Array<{ id: string; title: string }>;
 }
 
 export interface AlertRule {

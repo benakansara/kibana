@@ -25,6 +25,7 @@ export interface CreateRuleRequestBody<Params extends RuleParamsV1 = never> {
   enabled: CreateBodySchema['enabled'];
   consumer: CreateBodySchema['consumer'];
   tags: CreateBodySchema['tags'];
+  dashboards?: CreateBodySchema['dashboards'];
   throttle?: CreateBodySchema['throttle'];
   params: Params;
   schedule: CreateBodySchema['schedule'];

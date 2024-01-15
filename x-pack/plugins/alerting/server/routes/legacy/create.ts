@@ -27,6 +27,9 @@ export const bodySchema = schema.object({
   enabled: schema.boolean({ defaultValue: true }),
   consumer: schema.string(),
   tags: schema.arrayOf(schema.string(), { defaultValue: [] }),
+  dashboards: schema.maybe(
+    schema.arrayOf(schema.object({ id: schema.string(), title: schema.string() }))
+  ),
   throttle: schema.nullable(schema.string({ validate: validateDurationSchema })),
   params: schema.recordOf(schema.string(), schema.any(), { defaultValue: {} }),
   schedule: schema.object({

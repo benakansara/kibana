@@ -25,6 +25,7 @@ export const transformRuleDomainToRuleAttributes = (
   return {
     name: rule.name,
     tags: rule.tags,
+    dashboards: rule.dashboards,
     enabled: rule.enabled,
     alertTypeId: rule.alertTypeId,
     consumer: rule.consumer,

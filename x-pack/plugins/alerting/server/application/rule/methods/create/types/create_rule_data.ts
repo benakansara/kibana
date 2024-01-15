@@ -17,6 +17,7 @@ export interface CreateRuleData<Params extends RuleParams = never> {
   enabled: CreateRuleDataType['enabled'];
   consumer: CreateRuleDataType['consumer'];
   tags: CreateRuleDataType['tags'];
+  dashboards?: CreateRuleDataType['dashboards'];
   throttle?: CreateRuleDataType['throttle'];
   params: Params;
   schedule: CreateRuleDataType['schedule'];

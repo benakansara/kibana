@@ -26,6 +26,7 @@ export interface RuleResponse<Params extends RuleParams = never> {
   enabled: RuleResponseSchemaType['enabled'];
   name: RuleResponseSchemaType['name'];
   tags: RuleResponseSchemaType['tags'];
+  dashboards?: RuleResponseSchemaType['dashboards'];
   rule_type_id: RuleResponseSchemaType['rule_type_id'];
   consumer: RuleResponseSchemaType['consumer'];
   schedule: RuleResponseSchemaType['schedule'];

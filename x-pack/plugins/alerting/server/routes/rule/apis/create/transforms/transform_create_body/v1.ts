@@ -53,6 +53,7 @@ export const transformCreateBody = <Params extends RuleParams = never>(
     enabled: createBody.enabled,
     consumer: createBody.consumer,
     tags: createBody.tags,
+    dashboards: createBody.dashboards,
     ...(createBody.throttle ? { throttle: createBody.throttle } : {}),
     params: createBody.params,
     schedule: createBody.schedule,

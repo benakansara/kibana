@@ -307,6 +307,7 @@ export class ExecutionHandler<
             alertName: this.rule.name,
             spaceId,
             tags: this.rule.tags,
+            dashboards: this.rule.dashboards,
             alertInstanceId: executableAlert.getId(),
             alertUuid: executableAlert.getUuid(),
             alertActionGroup: actionGroup,

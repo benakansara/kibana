@@ -257,6 +257,7 @@ export class TaskRunner<
       revision: rule.revision,
       spaceId,
       tags: rule.tags,
+      dashboards: rule.dashboards,
     };
   }
 

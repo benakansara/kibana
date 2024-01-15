@@ -25,6 +25,7 @@ export function alertSummaryFromEventLog(params: AlertSummaryFromEventLogParams)
     id: rule.id,
     name: rule.name,
     tags: rule.tags,
+    dashboards: rule.dashboards,
     ruleTypeId: rule.alertTypeId,
     consumer: rule.consumer,
     statusStartDate: dateStart,

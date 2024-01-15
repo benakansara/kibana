@@ -145,6 +145,7 @@ interface RuleMetaAttributes {
 export interface RuleAttributes {
   name: string;
   tags: string[];
+  dashboards?: Array<{ id: string; title: string }>;
   enabled: boolean;
   alertTypeId: string;
   consumer: string;

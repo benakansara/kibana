@@ -58,6 +58,7 @@ export interface Rule<Params extends RuleParams = never> {
   enabled: RuleSchemaType['enabled'];
   name: RuleSchemaType['name'];
   tags: RuleSchemaType['tags'];
+  dashboards?: RuleSchemaType['dashboards'];
   alertTypeId: RuleSchemaType['alertTypeId'];
   consumer: RuleSchemaType['consumer'];
   schedule: RuleSchemaType['schedule'];
@@ -92,6 +93,7 @@ export interface RuleDomain<Params extends RuleParams = never> {
   enabled: RuleDomainSchemaType['enabled'];
   name: RuleDomainSchemaType['name'];
   tags: RuleDomainSchemaType['tags'];
+  dashboards?: RuleDomainSchemaType['dashboards'];
   alertTypeId: RuleDomainSchemaType['alertTypeId'];
   consumer: RuleDomainSchemaType['consumer'];
   schedule: RuleDomainSchemaType['schedule'];

@@ -27,6 +27,9 @@ const paramSchema = schema.object({
 const bodySchema = schema.object({
   name: schema.string(),
   tags: schema.arrayOf(schema.string(), { defaultValue: [] }),
+  dashboards: schema.maybe(
+    schema.arrayOf(schema.object({ id: schema.string(), title: schema.string() }))
+  ),
   schedule: schema.object({
     interval: schema.string({ validate: validateDurationSchema }),
   }),
@@ -66,7 +69,8 @@ export const updateAlertRoute = (
         trackLegacyRouteUsage('update', usageCounter);
         const rulesClient = (await context.alerting).getRulesClient();
         const { id } = req.params;
-        const { name, actions, params, schedule, tags, throttle, notifyWhen } = req.body;
+        const { name, actions, params, schedule, tags, throttle, notifyWhen, dashboards } =
+          req.body;
         try {
           const alertRes = await rulesClient.update({
             id,
@@ -78,6 +82,7 @@ export const updateAlertRoute = (
               tags,
               throttle,
               notifyWhen: notifyWhen as RuleNotifyWhenType,
+              dashboards,
             },
           });
           return res.ok({

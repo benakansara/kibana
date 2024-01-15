@@ -45,6 +45,7 @@ export const transformRuleToRuleResponse = <Params extends RuleParams = never>(
   enabled: rule.enabled,
   name: rule.name,
   tags: rule.tags,
+  dashboards: rule.dashboards,
   rule_type_id: rule.alertTypeId,
   consumer: rule.consumer,
   schedule: rule.schedule,

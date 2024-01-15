@@ -22,6 +22,7 @@ export const transformRuleDomainToRule = <Params extends RuleParams = never>(
     enabled: ruleDomain.enabled,
     name: ruleDomain.name,
     tags: ruleDomain.tags,
+    dashboards: ruleDomain.dashboards,
     alertTypeId: ruleDomain.alertTypeId,
     consumer: ruleDomain.consumer,
     schedule: ruleDomain.schedule,

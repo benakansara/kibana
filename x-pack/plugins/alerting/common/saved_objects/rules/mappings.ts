@@ -25,6 +25,16 @@ export const alertMappings: SavedObjectsTypeMappingDefinition = {
     tags: {
       type: 'keyword',
     },
+    dashboards: {
+      properties: {
+        id: {
+          type: 'keyword',
+        },
+        title: {
+          type: 'keyword',
+        },
+      },
+    },
     alertTypeId: {
       type: 'keyword',
     },

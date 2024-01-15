@@ -46,6 +46,7 @@ export interface UpdateOptions<Params extends RuleTypeParams> {
   data: {
     name: string;
     tags: string[];
+    dashboards?: Array<{ id: string; title: string }>;
     schedule: IntervalSchedule;
     actions: NormalizedAlertAction[];
     params: Params;

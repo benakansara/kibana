@@ -25,6 +25,7 @@ export interface TransformActionParamsOptions {
   alertName: string;
   spaceId: string;
   tags?: string[];
+  dashboards?: Array<{ id: string; title: string }>;
   alertInstanceId: string;
   alertUuid: string;
   alertActionGroup: string;
@@ -153,6 +154,7 @@ export function transformSummaryActionParams({
     alertName: rule.name,
     spaceId,
     tags: rule.tags,
+    dashboards: rule.dashboards,
     params: rule.params,
     alertInstanceId: rule.id,
     alertActionGroup: 'default',
@@ -186,6 +188,7 @@ export function transformSummaryActionParams({
       type: ruleTypeId,
       url: ruleUrl,
       tags: rule.tags,
+      dashboards: rule.dashboards,
       spaceId,
     },
     alerts,

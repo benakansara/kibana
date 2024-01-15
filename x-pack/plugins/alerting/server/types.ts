@@ -451,6 +451,7 @@ export interface RawRule extends SavedObjectAttributes {
   enabled: boolean;
   name: string;
   tags: string[];
+  dashboards?: Array<{ id: string; title: string }>;
   alertTypeId: string; // this cannot be renamed since it is in the saved object
   consumer: string;
   legacyId: string | null;

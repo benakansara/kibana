@@ -59,7 +59,7 @@ export default function AlertDetailsAppSection({
   setAlertSummaryFields,
 }: AppSectionProps) {
   const services = useKibana().services;
-  const { uiSettings, charts, data } = services;
+  const { uiSettings, charts, data, http } = services;
   const { euiTheme } = useEuiTheme();
   const { hasAtLeast } = useLicense();
   const hasLogRateAnalysisLicense = hasAtLeast('platinum');
@@ -103,8 +103,27 @@ export default function AlertDetailsAppSection({
           </EuiLink>
         ),
       },
+      {
+        label: i18n.translate(
+          'xpack.observability.customThreshold.rule.alertDetailsAppSection.summaryField.dashboards',
+          {
+            defaultMessage: 'Dashboards',
+          }
+        ),
+        value: rule.dashboards?.map((dashboard) => (
+          <div>
+            <EuiLink
+              data-test-subj="thresholdRuleAlertDetailsAppSectionDashboardsLink"
+              href={http.basePath.prepend(`/app/dashboards#/view/${dashboard.id}`)}
+              target="_blank"
+            >
+              {dashboard.title}
+            </EuiLink>
+          </div>
+        )),
+      },
     ]);
-  }, [alert, rule, ruleLink, setAlertSummaryFields]);
+  }, [alert, rule, ruleLink, setAlertSummaryFields, http]);
 
   const derivedIndexPattern = useMemo<DataViewBase>(
     () => ({

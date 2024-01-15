@@ -146,6 +146,7 @@ export interface Rule<Params extends RuleTypeParams = never> {
   enabled: boolean;
   name: string;
   tags: string[];
+  dashboards?: Array<{ id: string; title: string }>;
   alertTypeId: string; // this is persisted in the Rule saved object so we would need a migration to change this to ruleTypeId
   consumer: string;
   schedule: IntervalSchedule;

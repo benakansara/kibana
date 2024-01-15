@@ -34,6 +34,9 @@ const paramSchema = schema.object({
 const bodySchema = schema.object({
   name: schema.string(),
   tags: schema.arrayOf(schema.string(), { defaultValue: [] }),
+  dashboards: schema.maybe(
+    schema.arrayOf(schema.object({ id: schema.string(), title: schema.string() }))
+  ),
   schedule: schema.object({
     interval: schema.string({ validate: validateDurationSchema }),
   }),

@@ -140,6 +140,9 @@ export const ruleDomainSchema = schema.object({
   enabled: schema.boolean(),
   name: schema.string(),
   tags: schema.arrayOf(schema.string()),
+  dashboards: schema.maybe(
+    schema.arrayOf(schema.object({ id: schema.string(), title: schema.string() }))
+  ),
   alertTypeId: schema.string(),
   consumer: schema.string(),
   schedule: intervalScheduleSchema,
@@ -178,6 +181,9 @@ export const ruleSchema = schema.object({
   enabled: schema.boolean(),
   name: schema.string(),
   tags: schema.arrayOf(schema.string()),
+  dashboards: schema.maybe(
+    schema.arrayOf(schema.object({ id: schema.string(), title: schema.string() }))
+  ),
   alertTypeId: schema.string(),
   consumer: schema.string(),
   schedule: intervalScheduleSchema,
