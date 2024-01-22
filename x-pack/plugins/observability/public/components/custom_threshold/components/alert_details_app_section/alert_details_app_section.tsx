@@ -75,7 +75,12 @@ export default function AlertDetailsAppSection({
   const chartProps = {
     baseTheme: charts.theme.useChartsBaseTheme(),
   };
-  const timeRange = getPaddedAlertTimeRange(alert.fields[ALERT_START]!, alert.fields[ALERT_END]);
+  const alertStartTime = alert.fields[ALERT_START];
+  const alertEndTime = alert.fields[ALERT_END];
+  const timeRange = useMemo(
+    () => getPaddedAlertTimeRange(alertStartTime!, alertEndTime),
+    [alertStartTime, alertEndTime]
+  );
   const alertEnd = alert.fields[ALERT_END] ? moment(alert.fields[ALERT_END]).valueOf() : undefined;
   const annotations = [
     <AlertAnnotation
