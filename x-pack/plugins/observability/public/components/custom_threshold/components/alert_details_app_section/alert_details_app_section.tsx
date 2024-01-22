@@ -135,31 +135,6 @@ export default function AlertDetailsAppSection({
     }
     alertSummaryFields.push({
       label: i18n.translate(
-        'xpack.observability.customThreshold.rule.alertDetailsAppSection.summaryField.dashboards',
-        {
-          defaultMessage: 'Dashboards',
-        }
-      ),
-      value: rule.dashboards?.map((dashboard) => (
-        <div>
-          <EuiLink
-            data-test-subj="thresholdRuleAlertDetailsAppSectionDashboardsLink"
-            href={http.basePath.prepend(
-              `/app/dashboards#/view/${dashboard.id}?_g=(time:(from:'${timeRange.from}',to:'${
-                timeRange.to
-              }'),alert:(start:'${alert.fields[ALERT_START]}'${
-                alert.fields[ALERT_END] ? `,end:'${alert.fields[ALERT_END]}'` : ''
-              },rule:'${alert.fields[ALERT_RULE_NAME]}',reason:'${alert.fields[ALERT_REASON]}'))`
-            )}
-            target="_blank"
-          >
-            {dashboard.title}
-          </EuiLink>
-        </div>
-      )),
-    });
-    alertSummaryFields.push({
-      label: i18n.translate(
         'xpack.observability.customThreshold.rule.alertDetailsAppSection.summaryField.rule',
         {
           defaultMessage: 'Rule',
@@ -171,6 +146,33 @@ export default function AlertDetailsAppSection({
         </EuiLink>
       ),
     });
+    if (rule.dashboards && rule.dashboards?.length > 0) {
+      alertSummaryFields.push({
+        label: i18n.translate(
+          'xpack.observability.customThreshold.rule.alertDetailsAppSection.summaryField.dashboards',
+          {
+            defaultMessage: 'Dashboards',
+          }
+        ),
+        value: rule.dashboards?.map((dashboard) => (
+          <div>
+            <EuiLink
+              data-test-subj="thresholdRuleAlertDetailsAppSectionDashboardsLink"
+              href={http.basePath.prepend(
+                `/app/dashboards#/view/${dashboard.id}?_g=(time:(from:'${timeRange.from}',to:'${
+                  timeRange.to
+                }'),alert:(start:'${alert.fields[ALERT_START]}'${
+                  alert.fields[ALERT_END] ? `,end:'${alert.fields[ALERT_END]}'` : ''
+                },rule:'${alert.fields[ALERT_RULE_NAME]}',reason:'${alert.fields[ALERT_REASON]}'))`
+              )}
+              target="_blank"
+            >
+              {dashboard.title}
+            </EuiLink>
+          </div>
+        )),
+      });
+    }
 
     setAlertSummaryFields(alertSummaryFields);
   }, [alert, rule, ruleLink, setAlertSummaryFields, http, timeRange]);
