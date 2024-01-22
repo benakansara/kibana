@@ -20,7 +20,13 @@ import {
   EuiTitle,
   useEuiTheme,
 } from '@elastic/eui';
-import { ALERT_END, ALERT_START, ALERT_EVALUATION_VALUES } from '@kbn/rule-data-utils';
+import {
+  ALERT_END,
+  ALERT_START,
+  ALERT_RULE_NAME,
+  ALERT_REASON,
+  ALERT_EVALUATION_VALUES,
+} from '@kbn/rule-data-utils';
 import { Rule, RuleTypeParams } from '@kbn/alerting-plugin/common';
 import { AlertAnnotation, AlertActiveTimeRangeAnnotation } from '@kbn/observability-alert-details';
 import { getPaddedAlertTimeRange } from '@kbn/observability-get-padded-alert-time-range-util';
@@ -114,7 +120,13 @@ export default function AlertDetailsAppSection({
           <div>
             <EuiLink
               data-test-subj="thresholdRuleAlertDetailsAppSectionDashboardsLink"
-              href={http.basePath.prepend(`/app/dashboards#/view/${dashboard.id}`)}
+              href={http.basePath.prepend(
+                `/app/dashboards#/view/${dashboard.id}?_g=(time:(from:'${timeRange.from}',to:'${
+                  timeRange.to
+                }'),alert:(start:'${alert.fields[ALERT_START]}'${
+                  alert.fields[ALERT_END] ? `,end:'${alert.fields[ALERT_END]}'` : ''
+                },rule:'${alert.fields[ALERT_RULE_NAME]}',reason:'${alert.fields[ALERT_REASON]}'))`
+              )}
               target="_blank"
             >
               {dashboard.title}
@@ -123,7 +135,7 @@ export default function AlertDetailsAppSection({
         )),
       },
     ]);
-  }, [alert, rule, ruleLink, setAlertSummaryFields, http]);
+  }, [alert, rule, ruleLink, setAlertSummaryFields, http, timeRange]);
 
   const derivedIndexPattern = useMemo<DataViewBase>(
     () => ({

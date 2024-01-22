@@ -23,4 +23,10 @@ export type QueryState = {
   refreshInterval?: RefreshInterval;
   filters?: Filter[];
   query?: Query | AggregateQuery;
+  alert?: {
+    start: string;
+    end: string;
+    rule: string;
+    reason: string;
+  };
 };
