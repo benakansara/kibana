@@ -181,33 +181,38 @@ export const loadDashboardState = async ({
 
   if (globalStateInUrl.alert) {
     Object.keys(parsedJSON).forEach((key, index) => {
-      parsedJSON[key].embeddableConfig.attributes.state.visualization.layers.push({
-        layerId: uuidv4(),
-        layerType: 'annotations',
-        annotations: [
-          {
-            label: `${globalStateInUrl.alert?.rule} - ${globalStateInUrl.alert?.reason}`,
-            type: 'manual',
-            key: {
-              type: globalStateInUrl.alert?.end ? 'range' : 'point_in_time',
-              timestamp: globalStateInUrl.alert?.start,
-              endTimestamp: globalStateInUrl.alert?.end,
+      if (
+        parsedJSON[key].embeddableConfig.attributes &&
+        parsedJSON[key].embeddableConfig.attributes.state
+      ) {
+        parsedJSON[key].embeddableConfig.attributes.state.visualization.layers.push({
+          layerId: uuidv4(),
+          layerType: 'annotations',
+          annotations: [
+            {
+              label: `${globalStateInUrl.alert?.rule} - ${globalStateInUrl.alert?.reason}`,
+              type: 'manual',
+              key: {
+                type: globalStateInUrl.alert?.end ? 'range' : 'point_in_time',
+                timestamp: globalStateInUrl.alert?.start,
+                endTimestamp: globalStateInUrl.alert?.end,
+              },
+              color: globalStateInUrl.alert?.end
+                ? chroma(transparentize('#F04E981A', 0.2)).hex().toUpperCase()
+                : '',
+              icon: 'alert',
+              lineWidth: '3',
+              lineStyle: 'dotted',
+              textVisibility: true,
+              id: uuidv4(),
             },
-            color: globalStateInUrl.alert?.end
-              ? chroma(transparentize('#F04E981A', 0.2)).hex().toUpperCase()
-              : '',
-            icon: 'alert',
-            lineWidth: '3',
-            lineStyle: 'dotted',
-            textVisibility: true,
-            id: uuidv4(),
-          },
-        ],
-        indexPatternId: parsedJSON[key].embeddableConfig.attributes.references.find(
-          (r: any) => r.type === 'index-pattern'
-        ).id,
-        ignoreGlobalFilters: true,
-      });
+          ],
+          indexPatternId: parsedJSON[key].embeddableConfig.attributes.references.find(
+            (r: any) => r.type === 'index-pattern'
+          ).id,
+          ignoreGlobalFilters: true,
+        });
+      }
     });
   }
 

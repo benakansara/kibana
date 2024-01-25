@@ -40,7 +40,7 @@ export async function getAlertGroups({
             },
           },
         },
-        _source: ['kibana.alert.group', 'kibana.alert.context.groupByKeys'],
+        _source: ['kibana.alert.group'],
       },
     });
 
