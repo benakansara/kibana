@@ -27,7 +27,7 @@ export async function getAlertGroups({
       index: '.alerts-observability.*',
       allow_no_indices: true,
       body: {
-        // size: 5,
+        size: 1000,
         query: {
           bool: {
             filter: {
