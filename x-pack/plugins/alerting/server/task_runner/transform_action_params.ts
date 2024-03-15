@@ -38,6 +38,7 @@ export interface TransformActionParamsOptions {
   flapping: boolean;
   aadAlert?: AADAlert;
   consecutiveMatches?: number;
+  dashboards?: Array<{ id: string; title: string }>;
 }
 
 interface SummarizedAlertsWithAll {
@@ -189,8 +190,10 @@ export function transformSummaryActionParams({
       url: ruleUrl,
       tags: rule.tags,
       spaceId,
+      dashboards: rule.dashboards,
     },
     alerts,
+    dashboards: rule.dashboards,
   };
   return actionsPlugin.renderActionParameterTemplates(
     actionTypeId,

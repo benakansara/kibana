@@ -41,4 +41,7 @@ export const createRuleDataSchema = schema.object({
   ),
   notifyWhen: schema.maybe(schema.nullable(notifyWhenSchema)),
   alertDelay: schema.maybe(alertDelaySchema),
+  dashboards: schema.maybe(
+    schema.arrayOf(schema.object({ id: schema.string(), title: schema.string() }))
+  ),
 });

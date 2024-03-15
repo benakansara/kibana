@@ -219,6 +219,9 @@ export const ruleResponseSchema = schema.object({
   running: schema.maybe(schema.nullable(schema.boolean())),
   view_in_app_relative_url: schema.maybe(schema.nullable(schema.string())),
   alert_delay: schema.maybe(alertDelaySchema),
+  dashboards: schema.maybe(
+    schema.arrayOf(schema.object({ id: schema.string(), title: schema.string() }))
+  ),
 });
 
 export const scheduleIdsSchema = schema.maybe(schema.arrayOf(schema.string()));

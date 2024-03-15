@@ -319,6 +319,7 @@ export class ExecutionHandler<
             flapping: executableAlert.getFlapping(),
             ruleUrl: ruleUrl?.absoluteUrl,
             consecutiveMatches: executableAlert.getActiveCount(),
+            dashboards: this.rule.dashboards,
           };
 
           if (executableAlert.isAlertAsData()) {

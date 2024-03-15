@@ -69,5 +69,6 @@ export const transformRuleDomainToRuleAttributes = (
     revision: rule.revision,
     ...(rule.running !== undefined ? { running: rule.running } : {}),
     ...(rule.alertDelay !== undefined ? { alertDelay: rule.alertDelay } : {}),
+    dashboards: rule.dashboards,
   };
 };

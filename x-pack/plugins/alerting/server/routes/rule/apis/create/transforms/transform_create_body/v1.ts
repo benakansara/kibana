@@ -59,5 +59,6 @@ export const transformCreateBody = <Params extends RuleParams = never>(
     actions: transformCreateBodyActions(createBody.actions),
     ...(createBody.notify_when ? { notifyWhen: createBody.notify_when } : {}),
     ...(createBody.alert_delay ? { alertDelay: createBody.alert_delay } : {}),
+    dashboards: createBody.dashboards,
   };
 };

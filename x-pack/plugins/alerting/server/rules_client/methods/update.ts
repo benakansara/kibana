@@ -52,6 +52,7 @@ export interface UpdateOptions<Params extends RuleTypeParams> {
     throttle?: string | null;
     notifyWhen?: RuleNotifyWhenType | null;
     alertDelay?: AlertDelay;
+    dashboards?: Array<{ id: string; title: string }>;
   };
   allowMissingConnectorSecrets?: boolean;
   shouldIncrementRevision?: ShouldIncrementRevision;

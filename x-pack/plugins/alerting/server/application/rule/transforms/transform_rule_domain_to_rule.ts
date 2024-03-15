@@ -50,6 +50,7 @@ export const transformRuleDomainToRule = <Params extends RuleParams = never>(
     running: ruleDomain.running,
     viewInAppRelativeUrl: ruleDomain.viewInAppRelativeUrl,
     alertDelay: ruleDomain.alertDelay,
+    dashboards: ruleDomain.dashboards,
   };
 
   if (isPublic) {

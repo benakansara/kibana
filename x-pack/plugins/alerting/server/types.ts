@@ -500,6 +500,7 @@ export interface RawRule extends SavedObjectAttributes {
   revision: number;
   running?: boolean | null;
   alertDelay?: AlertDelay;
+  dashboards?: Array<{ id: string; title: string }>;
 }
 
 export type { DataStreamAdapter } from './alerts_service/lib/data_stream_adapter';

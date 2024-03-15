@@ -180,6 +180,7 @@ export interface Rule<Params extends RuleTypeParams = never> {
   running?: boolean | null;
   viewInAppRelativeUrl?: string;
   alertDelay?: AlertDelay;
+  dashboards?: Array<{ id: string; title: string }>;
 }
 
 export interface SanitizedAlertsFilter extends AlertsFilter {

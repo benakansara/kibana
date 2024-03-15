@@ -13,7 +13,15 @@ import { transformRule } from './common_transformations';
 
 type RuleUpdatesBody = Pick<
   RuleUpdates,
-  'name' | 'tags' | 'schedule' | 'actions' | 'params' | 'throttle' | 'notifyWhen' | 'alertDelay'
+  | 'name'
+  | 'tags'
+  | 'schedule'
+  | 'actions'
+  | 'params'
+  | 'throttle'
+  | 'notifyWhen'
+  | 'alertDelay'
+  | 'dashboards'
 >;
 const rewriteBodyRequest: RewriteResponseCase<RuleUpdatesBody> = ({
   actions,
@@ -47,7 +55,10 @@ export async function updateRule({
   id,
 }: {
   http: HttpSetup;
-  rule: Pick<RuleUpdates, 'name' | 'tags' | 'schedule' | 'params' | 'actions' | 'alertDelay'>;
+  rule: Pick<
+    RuleUpdates,
+    'name' | 'tags' | 'schedule' | 'params' | 'actions' | 'alertDelay' | 'dashboards'
+  >;
   id: string;
 }): Promise<Rule> {
   const res = await http.put<AsApiContract<Rule>>(
@@ -55,7 +66,7 @@ export async function updateRule({
     {
       body: JSON.stringify(
         rewriteBodyRequest(
-          pick(rule, ['name', 'tags', 'schedule', 'params', 'actions', 'alertDelay'])
+          pick(rule, ['name', 'tags', 'schedule', 'params', 'actions', 'alertDelay', 'dashboards'])
         )
       ),
     }

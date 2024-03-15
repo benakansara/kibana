@@ -217,6 +217,7 @@ export const transformRuleAttributesToRuleDomain = <Params extends RuleParams = 
     revision: esRule.revision,
     running: esRule.running,
     ...(esRule.alertDelay ? { alertDelay: esRule.alertDelay } : {}),
+    dashboards: esRule.dashboards,
   };
 
   // Bad casts, but will fix once we fix all rule types

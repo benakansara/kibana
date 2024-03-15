@@ -8,7 +8,7 @@
 import chroma from 'chroma-js';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -29,6 +29,7 @@ import {
   ALERT_EVALUATION_VALUES,
   ALERT_GROUP,
   TAGS,
+  ALERT_REASON,
 } from '@kbn/rule-data-utils';
 import { DataView } from '@kbn/data-views-plugin/common';
 import type {
@@ -242,6 +243,34 @@ export default function AlertDetailsAppSection({
         </EuiLink>
       ),
     });
+
+    if (rule.dashboards && rule.dashboards?.length > 0) {
+      alertSummaryFields.push({
+        label: i18n.translate(
+          'xpack.observability.customThreshold.rule.alertDetailsAppSection.summaryField.dashboards',
+          {
+            defaultMessage: 'Dashboards',
+          }
+        ),
+        value: rule.dashboards?.map((dashboard) => (
+          <div>
+            <EuiLink
+              data-test-subj="thresholdRuleAlertDetailsAppSectionDashboardsLink"
+              href={http.basePath.prepend(
+                `/app/dashboards#/view/${dashboard.id}?_g=(time:(from:'${timeRange.from}',to:'${
+                  timeRange.to
+                }'),alert:(start:'${alertStart}'${alertEnd ? `,end:'${alertEnd}'` : ''},rule:'${
+                  rule.name
+                }',reason:'${alertReason}'))`
+              )}
+              target="_blank"
+            >
+              {dashboard.title}
+            </EuiLink>
+          </div>
+        )),
+      });
+    }
 
     setAlertSummaryFields(alertSummaryFields);
   }, [groups, tags, rule, ruleLink, setAlertSummaryFields, timeRange, alertEnd, viewInAppUrl]);

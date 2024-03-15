@@ -179,4 +179,5 @@ export interface RuleAttributes {
   revision: number;
   running?: boolean | null;
   alertDelay?: AlertDelayAttributes;
+  dashboards?: Array<{ id: string; title: string }>;
 }

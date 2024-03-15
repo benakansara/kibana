@@ -120,4 +120,5 @@ export const transformRuleToRuleResponse = <Params extends RuleParams = never>(
     ? { view_in_app_relative_url: rule.viewInAppRelativeUrl }
     : {}),
   ...(rule.alertDelay !== undefined ? { alert_delay: rule.alertDelay } : {}),
+  dashboards: rule.dashboards,
 });

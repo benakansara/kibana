@@ -26,6 +26,7 @@ export const alertRuleData: AlertRuleData = {
   spaceId: 'default',
   tags: ['rule-', '-tags'],
   alertDelay: 0,
+  dashboards: [{ id: '123', title: 'dashboard1' }],
 };
 
 export const mockAAD = {

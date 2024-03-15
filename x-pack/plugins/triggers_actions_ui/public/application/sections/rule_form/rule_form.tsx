@@ -61,6 +61,7 @@ import {
 } from '@kbn/alerting-plugin/common';
 import { AlertingConnectorFeatureId } from '@kbn/actions-plugin/common';
 import { AlertConsumers } from '@kbn/rule-data-utils';
+import { SimpleSavedObject } from '@kbn/core/public';
 import { RuleReducerAction, InitialRule } from './rule_reducer';
 import {
   RuleTypeModel,
@@ -196,6 +197,7 @@ export const RuleForm = ({
     data,
     unifiedSearch,
     dataViews,
+    savedObjects,
   } = useKibana().services;
   const canShowActions = hasShowActionsCapability(capabilities);
 
@@ -626,6 +628,62 @@ export const RuleForm = ({
     />,
   ];
 
+  const [dashboardList, setDashboardList] = useState<
+    Array<{
+      value: string;
+      label: string;
+    }>
+  >();
+
+  const [selectedDashboards, setSelectedDashboards] = useState<
+    Array<{ label: string; value: string }> | undefined
+  >(
+    rule.dashboards?.map((dashboard) => ({
+      label: dashboard.title,
+      value: dashboard.id,
+    }))
+  );
+
+  const onChange = (selectedOptions: any[]) => {
+    setSelectedDashboards(selectedOptions);
+
+    setRuleProperty(
+      'dashboards',
+      selectedOptions.map((selectedOption) => ({
+        id: selectedOption.value,
+        title: selectedOption.label,
+      }))
+    );
+  };
+
+  const dashboardSavedObjectToMenuItem = (
+    savedObject: SimpleSavedObject<{
+      title: string;
+    }>
+  ) => ({
+    value: savedObject.id,
+    label: savedObject.attributes.title,
+  });
+
+  const loadDashboards = useCallback(
+    async (searchString?: string) => {
+      const { savedObjects: dashboardSO } = await savedObjects.client.find<{ title: string }>({
+        type: 'dashboard',
+        search: searchString ? `${searchString}*` : undefined,
+        searchFields: ['title^3', 'description'],
+        defaultSearchOperator: 'AND',
+        perPage: 100,
+      });
+
+      setDashboardList(dashboardSO.map(dashboardSavedObjectToMenuItem));
+    },
+    [savedObjects]
+  );
+
+  useEffect(() => {
+    loadDashboards();
+  }, [loadDashboards]);
+
   const getHelpTextForInterval = () => {
     if (!config || !config.minimumScheduleInterval) {
       return '';
@@ -834,7 +892,25 @@ export const RuleForm = ({
           <EuiSpacer size="m" />
         </>
       )}
-
+      <EuiFlexItem>
+        <EuiSpacer size="m" />
+        <EuiTitle size="xs">
+          <h6>
+            <FormattedMessage
+              id="xpack.observability.customThreshold.rule.alertFlyout.linkDashboards"
+              defaultMessage="Link dashboard(s)"
+            />
+          </h6>
+        </EuiTitle>
+        <EuiSpacer size="s" />
+        <EuiComboBox
+          fullWidth
+          options={dashboardList}
+          selectedOptions={selectedDashboards}
+          onChange={onChange}
+        />
+        <EuiSpacer size="m" />
+      </EuiFlexItem>
       <EuiFlexItem>
         <EuiAccordion
           id="advancedOptionsAccordion"

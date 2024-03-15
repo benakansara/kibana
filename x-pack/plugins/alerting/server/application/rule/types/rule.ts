@@ -86,6 +86,7 @@ export interface Rule<Params extends RuleParams = never> {
   running?: RuleSchemaType['running'];
   viewInAppRelativeUrl?: RuleSchemaType['viewInAppRelativeUrl'];
   alertDelay?: RuleSchemaType['alertDelay'];
+  dashboards?: RuleSchemaType['dashboards'];
 }
 
 export interface RuleDomain<Params extends RuleParams = never> {
@@ -122,4 +123,5 @@ export interface RuleDomain<Params extends RuleParams = never> {
   running?: RuleDomainSchemaType['running'];
   viewInAppRelativeUrl?: RuleDomainSchemaType['viewInAppRelativeUrl'];
   alertDelay?: RuleSchemaType['alertDelay'];
+  dashboards?: RuleDomainSchemaType['dashboards'];
 }
