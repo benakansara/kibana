@@ -48,9 +48,10 @@ export const dashboardContentManagementServiceFactory: DashboardContentManagemen
     savedObjectsTagging,
   } = requiredServices;
   return {
-    loadDashboardState: ({ id }) =>
+    loadDashboardState: ({ id, alert }) =>
       loadDashboardState({
         id,
+        alert,
         data,
         embeddable,
         contentManagement,

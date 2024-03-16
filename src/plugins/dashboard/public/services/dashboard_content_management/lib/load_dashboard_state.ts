@@ -10,10 +10,16 @@ import { has } from 'lodash';
 
 import { Filter, Query } from '@kbn/es-query';
 import { ViewMode } from '@kbn/embeddable-plugin/public';
-import { SavedObjectNotFound } from '@kbn/kibana-utils-plugin/public';
+import { createKbnUrlStateStorage, SavedObjectNotFound } from '@kbn/kibana-utils-plugin/public';
 import { cleanFiltersForSerialize } from '@kbn/presentation-util-plugin/public';
 import { rawControlGroupAttributesToControlGroupInput } from '@kbn/controls-plugin/common';
-import { parseSearchSourceJSON, injectSearchSourceReferences } from '@kbn/data-plugin/public';
+import {
+  parseSearchSourceJSON,
+  injectSearchSourceReferences,
+  QueryState,
+} from '@kbn/data-plugin/public';
+import chroma from 'chroma-js';
+import { transparentize } from '@elastic/eui';
 
 import {
   injectReferences,
@@ -25,7 +31,12 @@ import { convertNumberToDashboardVersion } from './dashboard_versioning';
 import { DashboardCrudTypes } from '../../../../common/content_management';
 import type { LoadDashboardFromSavedObjectProps, LoadDashboardReturn } from '../types';
 import { dashboardContentManagementCache } from '../dashboard_content_management_service';
-import { DASHBOARD_CONTENT_ID, DEFAULT_DASHBOARD_INPUT } from '../../../dashboard_constants';
+import {
+  DASHBOARD_CONTENT_ID,
+  DEFAULT_DASHBOARD_INPUT,
+  GLOBAL_STATE_STORAGE_KEY,
+} from '../../../dashboard_constants';
+import { pluginServices } from '../../plugin_services';
 
 export function migrateLegacyQuery(query: Query | { [key: string]: any } | string): Query {
   // Lucene was the only option before, so language-less queries are all lucene
@@ -38,6 +49,7 @@ export function migrateLegacyQuery(query: Query | { [key: string]: any } | strin
 
 export const loadDashboardState = async ({
   id,
+  alert,
   data,
   embeddable,
   contentManagement,
@@ -47,6 +59,9 @@ export const loadDashboardState = async ({
     search: dataSearchService,
     query: { queryString },
   } = data;
+  const {
+    settings: { uiSettings },
+  } = pluginServices.getServices();
 
   const savedObjectId = id;
   const embeddableId = uuidv4();
@@ -167,7 +182,59 @@ export const loadDashboardState = async ({
    * Parse panels and options from JSON
    */
   const options: DashboardOptions = optionsJSON ? JSON.parse(optionsJSON) : undefined;
-  const panels = convertSavedPanelsToPanelMap(panelsJSON ? JSON.parse(panelsJSON) : []);
+
+  const parsedPanelsJSON = JSON.parse(panelsJSON);
+
+  if (!alert) {
+    const getUrlStateStorage = () =>
+      createKbnUrlStateStorage({
+        useHash: uiSettings.get('state:storeInSessionStorage'),
+      });
+
+    const globalStateInUrl = getUrlStateStorage().get<QueryState>(GLOBAL_STATE_STORAGE_KEY) || {};
+    alert = globalStateInUrl.alert;
+  }
+
+  if (alert) {
+    Object.keys(parsedPanelsJSON).forEach((key) => {
+      if (
+        parsedPanelsJSON[key].embeddableConfig.attributes &&
+        parsedPanelsJSON[key].embeddableConfig.attributes.state &&
+        alert
+      ) {
+        parsedPanelsJSON[key].embeddableConfig.attributes.state.visualization.layers.push({
+          layerId: uuidv4(),
+          layerType: 'annotations',
+          annotations: [
+            {
+              label: `${alert.ruleName}`,
+              type: 'manual',
+              key: {
+                type: alert.alertEnd ? 'range' : 'point_in_time',
+                timestamp: alert.alertStart,
+                endTimestamp: alert.alertEnd,
+              },
+              color: alert.alertEnd
+                ? chroma(transparentize('#F04E981A', 0.2)).hex().toUpperCase()
+                : '',
+              icon: 'alert',
+              lineWidth: '3',
+              lineStyle: 'dotted',
+              textVisibility: true,
+              id: uuidv4(),
+            },
+          ],
+          indexPatternId: parsedPanelsJSON[key].embeddableConfig.attributes.references.find(
+            (r: any) => r.type === 'index-pattern'
+          ).id,
+          ignoreGlobalFilters: true,
+        });
+      }
+    });
+  }
+
+  const newPanelsJSON = JSON.stringify(parsedPanelsJSON);
+  const panels = convertSavedPanelsToPanelMap(newPanelsJSON ? JSON.parse(newPanelsJSON) : []);
 
   const { dashboardInput, anyMigrationRun } = migrateDashboardInput(
     {

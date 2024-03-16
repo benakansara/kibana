@@ -29,3 +29,9 @@ export interface SavedQueryAttributes {
   filters?: Filter[];
   timefilter?: SavedQueryTimeFilter;
 }
+
+export interface AlertAnnotationInDashboard {
+  alertStart: string;
+  alertEnd?: string;
+  ruleName?: string;
+}

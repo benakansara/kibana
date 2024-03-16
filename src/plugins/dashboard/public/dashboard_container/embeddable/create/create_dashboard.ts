@@ -41,7 +41,10 @@ import { panelPlacementStrategies } from '../../component/panel_placement/place_
 import { startDiffingDashboardState } from '../../state/diffing/dashboard_diffing_integration';
 import { DashboardPublicState } from '../../types';
 import { DashboardContainer } from '../dashboard_container';
-import { DashboardCreationOptions } from '../dashboard_container_factory';
+import {
+  AlertAnnotationInDashboard,
+  DashboardCreationOptions,
+} from '../dashboard_container_factory';
 import { startSyncingDashboardControlGroup } from './controls/dashboard_control_group_integration';
 import { startSyncingDashboardDataViews } from './data_views/sync_dashboard_data_views';
 import { startDashboardSearchSessionIntegration } from './search_sessions/start_dashboard_search_session_integration';
@@ -53,7 +56,8 @@ import { syncUnifiedSearchState } from './unified_search/sync_dashboard_unified_
 export const createDashboard = async (
   creationOptions?: DashboardCreationOptions,
   dashboardCreationStartTime?: number,
-  savedObjectId?: string
+  savedObjectId?: string,
+  alert?: AlertAnnotationInDashboard
 ): Promise<DashboardContainer | undefined> => {
   const {
     data: { dataViews },
@@ -77,7 +81,7 @@ export const createDashboard = async (
   // --------------------------------------------------------------------------------------
   const reduxEmbeddablePackagePromise = lazyLoadReduxToolsPackage();
   const defaultDataViewExistsPromise = dataViews.defaultDataViewExists();
-  const dashboardSavedObjectPromise = loadDashboardState({ id: savedObjectId });
+  const dashboardSavedObjectPromise = loadDashboardState({ id: savedObjectId, alert });
 
   const [reduxEmbeddablePackage, savedObjectResult] = await Promise.all([
     reduxEmbeddablePackagePromise,

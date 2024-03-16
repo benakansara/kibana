@@ -246,7 +246,7 @@ export default function AlertDetailsAppSection({ alert, rule, ruleLink }: AppSec
     if (rule.dashboards && rule.dashboards?.length > 0) {
       summaryFields.push({
         label: i18n.translate(
-          'xpack.observability.customThreshold.rule.alertDetailsAppSection.summaryField.dashboards',
+          'xpack.observability.customThreshold.alertDetails.alertSummaryField.dashboards',
           {
             defaultMessage: 'Dashboards',
           }
@@ -254,13 +254,13 @@ export default function AlertDetailsAppSection({ alert, rule, ruleLink }: AppSec
         value: rule.dashboards?.map((dashboard) => (
           <div>
             <EuiLink
-              data-test-subj="thresholdRuleAlertDetailsAppSectionDashboardsLink"
+              data-test-subj="customThresholdAlertDetailsDashboardsLink"
               href={http.basePath.prepend(
                 `/app/dashboards#/view/${dashboard.id}?_g=(time:(from:'${timeRange.from}',to:'${
                   timeRange.to
-                }'),alert:(start:'${alertStart}'${alertEnd ? `,end:'${alertEnd}'` : ''},rule:'${
-                  rule.name
-                }',reason:'${alertReason}'))`
+                }'),alert:(alertStart:'${alertStart}'${
+                  alertEnd ? `,alertEnd:'${alertEnd}'` : ''
+                },ruleName:'${rule.name}'))`
               )}
               target="_blank"
             >
@@ -374,14 +374,14 @@ export default function AlertDetailsAppSection({ alert, rule, ruleLink }: AppSec
     </>
   ) : null;
 
-  const dashboardsTab = (
+  const dashboardsTab = alertStart ? (
     <DashboardRenderer
       savedObjectId={rule.dashboards?.[0].id}
-      alert={{ start: alertStart!, end: alertEnd, rule: rule.name, reason: alertReason }}
+      alert={{ alertStart, alertEnd, ruleName: rule.name }}
       getCreationOptions={getCreationOptions}
       ref={setDashboard}
     />
-  );
+  ) : null;
 
   const tabs: EuiTabbedContentTab[] = [
     {

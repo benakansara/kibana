@@ -30,6 +30,7 @@ import { DASHBOARD_CONTAINER_TYPE } from '..';
 import { DashboardContainerInput } from '../../../common';
 import type { DashboardContainer } from '../embeddable/dashboard_container';
 import {
+  AlertAnnotationInDashboard,
   DashboardContainerFactory,
   DashboardContainerFactoryDefinition,
   DashboardCreationOptions,
@@ -44,6 +45,7 @@ import {
 
 export interface DashboardRendererProps {
   savedObjectId?: string;
+  alert?: AlertAnnotationInDashboard;
   showPlainSpinner?: boolean;
   dashboardRedirect?: DashboardRedirect;
   getCreationOptions?: () => Promise<DashboardCreationOptions>;
@@ -51,7 +53,10 @@ export interface DashboardRendererProps {
 }
 
 export const DashboardRenderer = forwardRef<AwaitingDashboardAPI, DashboardRendererProps>(
-  ({ savedObjectId, getCreationOptions, dashboardRedirect, showPlainSpinner, locator }, ref) => {
+  (
+    { savedObjectId, alert, getCreationOptions, dashboardRedirect, showPlainSpinner, locator },
+    ref
+  ) => {
     const dashboardRoot = useRef(null);
     const dashboardViewport = useRef(null);
     const [loading, setLoading] = useState(true);
@@ -124,7 +129,8 @@ export const DashboardRenderer = forwardRef<AwaitingDashboardAPI, DashboardRende
           { id } as unknown as DashboardContainerInput, // Input from creationOptions is used instead.
           undefined,
           creationOptions,
-          savedObjectId
+          savedObjectId,
+          alert
         );
         setLoading(false);
 

@@ -12,6 +12,7 @@ import { SavedObjectSaveOpts } from '@kbn/saved-objects-plugin/public';
 
 import { DashboardContainerInput } from '../../../common';
 import { DashboardCrudTypes } from '../../../common/content_management';
+import { AlertAnnotationInDashboard } from '../../dashboard_container/embeddable/dashboard_container_factory';
 import { DashboardStartDependencies } from '../../plugin';
 import { DashboardBackupServiceType } from '../dashboard_backup/types';
 import { DashboardDataService } from '../data/types';
@@ -42,7 +43,10 @@ export interface DashboardContentManagementRequiredServices {
 export interface DashboardContentManagementService {
   findDashboards: FindDashboardsService;
   deleteDashboards: (ids: string[]) => Promise<void>;
-  loadDashboardState: (props: { id?: string }) => Promise<LoadDashboardReturn>;
+  loadDashboardState: (props: {
+    id?: string;
+    alert?: AlertAnnotationInDashboard;
+  }) => Promise<LoadDashboardReturn>;
   saveDashboardState: (props: SaveDashboardProps) => Promise<SaveDashboardReturn>;
   checkForDuplicateDashboardTitle: (meta: DashboardDuplicateTitleCheckProps) => Promise<boolean>;
   updateDashboardMeta: (
@@ -55,6 +59,7 @@ export interface DashboardContentManagementService {
  */
 export interface LoadDashboardFromSavedObjectProps {
   id?: string;
+  alert?: AlertAnnotationInDashboard;
   data: DashboardContentManagementRequiredServices['data'];
   contentManagement: DashboardStartDependencies['contentManagement'];
   embeddable: DashboardContentManagementRequiredServices['embeddable'];

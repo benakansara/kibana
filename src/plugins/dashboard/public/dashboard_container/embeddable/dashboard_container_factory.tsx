@@ -66,6 +66,12 @@ export interface DashboardCreationOptions {
   getEmbeddableAppContext?: (dashboardId?: string) => EmbeddableAppContext;
 }
 
+export interface AlertAnnotationInDashboard {
+  alertStart: string;
+  alertEnd?: string;
+  ruleName?: string;
+}
+
 export const dashboardTypeDisplayName = i18n.translate('dashboard.factory.displayName', {
   defaultMessage: 'Dashboard',
 });
@@ -107,7 +113,8 @@ export class DashboardContainerFactoryDefinition
     initialInput: DashboardContainerInput,
     parent?: Container,
     creationOptions?: DashboardCreationOptions,
-    savedObjectId?: string
+    savedObjectId?: string,
+    alert?: AlertAnnotationInDashboard
   ): Promise<DashboardContainer | ErrorEmbeddable | undefined> => {
     const dashboardCreationStartTime = performance.now();
     const { createDashboard } = await import('./create/create_dashboard');
@@ -115,7 +122,8 @@ export class DashboardContainerFactoryDefinition
       const dashboard = await createDashboard(
         creationOptions,
         dashboardCreationStartTime,
-        savedObjectId
+        savedObjectId,
+        alert
       );
       return dashboard;
     } catch (e) {
