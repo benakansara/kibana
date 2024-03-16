@@ -8,7 +8,7 @@
 import React, { useEffect, useState } from 'react';
 import { i18n } from '@kbn/i18n';
 import { useParams } from 'react-router-dom';
-import { EuiEmptyPrompt, EuiPanel, EuiSpacer } from '@elastic/eui';
+import { EuiEmptyPrompt, EuiPanel } from '@elastic/eui';
 import {
   AlertStatus,
   ALERT_RULE_CATEGORY,
@@ -27,7 +27,6 @@ import { usePluginContext } from '../../hooks/use_plugin_context';
 import { useFetchAlertDetail } from '../../hooks/use_fetch_alert_detail';
 import { PageTitle, pageTitleContent } from './components/page_title';
 import { HeaderActions } from './components/header_actions';
-import { AlertSummary, AlertSummaryField } from './components/alert_summary';
 import { CenterJustifiedSpinner } from '../../components/center_justified_spinner';
 import PageNotFound from '../404';
 import { getTimeZone } from '../../utils/get_time_zone';
@@ -72,7 +71,6 @@ export function AlertDetails() {
   const { rule } = useFetchRule({
     ruleId: alertDetail?.formatted.fields[ALERT_RULE_UUID],
   });
-  const [summaryFields, setSummaryFields] = useState<AlertSummaryField[]>();
   const [alertStatus, setAlertStatus] = useState<AlertStatus>();
 
   useEffect(() => {
@@ -196,14 +194,11 @@ export function AlertDetails() {
       data-test-subj="alertDetails"
     >
       <HeaderMenu />
-      <AlertSummary alertSummaryFields={summaryFields} />
-      <EuiSpacer size="l" />
       {AlertDetailsAppSection && rule && alertDetail?.formatted && (
         <AlertDetailsAppSection
           alert={alertDetail.formatted}
           rule={rule}
           timeZone={timeZone}
-          setAlertSummaryFields={setSummaryFields}
           ruleLink={http.basePath.prepend(paths.observability.ruleDetails(rule.id))}
         />
       )}

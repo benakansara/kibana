@@ -62,10 +62,10 @@ export const LazyAlertsFlyout = lazy(() => import('./components/alerts_flyout/al
 
 export * from './typings';
 import { TopAlert } from './typings/alerts';
-import { AlertSummary } from './pages/alert_details/components/alert_summary';
 import { AlertSummaryField } from './pages/alert_details/components/alert_summary';
-export type { TopAlert, AlertSummary, AlertSummaryField };
+export type { TopAlert, AlertSummaryField };
 
+export { AlertSummary } from './pages/alert_details/components/alert_summary';
 export { observabilityFeatureId, observabilityAppId } from '../common';
 
 export { useFetchDataViews } from './hooks/use_fetch_data_views';

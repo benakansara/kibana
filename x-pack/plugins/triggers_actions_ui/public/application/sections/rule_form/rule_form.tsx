@@ -892,25 +892,29 @@ export const RuleForm = ({
           <EuiSpacer size="m" />
         </>
       )}
-      <EuiFlexItem>
-        <EuiSpacer size="m" />
-        <EuiTitle size="xs">
-          <h6>
-            <FormattedMessage
-              id="xpack.observability.customThreshold.rule.alertFlyout.linkDashboards"
-              defaultMessage="Link dashboard(s)"
-            />
-          </h6>
-        </EuiTitle>
-        <EuiSpacer size="s" />
-        <EuiComboBox
-          fullWidth
-          options={dashboardList}
-          selectedOptions={selectedDashboards}
-          onChange={onChange}
-        />
-        <EuiSpacer size="m" />
-      </EuiFlexItem>
+      {selectedRuleType?.producer === AlertConsumers.OBSERVABILITY ||
+      selectedRuleType?.producer === AlertConsumers.APM ||
+      selectedRuleType?.producer === AlertConsumers.LOGS ? (
+        <EuiFlexItem>
+          <EuiSpacer size="m" />
+          <EuiTitle size="xs">
+            <h6>
+              <FormattedMessage
+                id="xpack.observability.customThreshold.rule.alertFlyout.linkDashboards"
+                defaultMessage="Link dashboard(s)"
+              />
+            </h6>
+          </EuiTitle>
+          <EuiSpacer size="s" />
+          <EuiComboBox
+            fullWidth
+            options={dashboardList}
+            selectedOptions={selectedDashboards}
+            onChange={onChange}
+          />
+          <EuiSpacer size="m" />
+        </EuiFlexItem>
+      ) : null}
       <EuiFlexItem>
         <EuiAccordion
           id="advancedOptionsAccordion"
