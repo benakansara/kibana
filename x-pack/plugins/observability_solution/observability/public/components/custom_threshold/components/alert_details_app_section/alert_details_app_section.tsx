@@ -8,7 +8,7 @@
 import chroma from 'chroma-js';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -40,6 +40,12 @@ import type {
   RangeEventAnnotationConfig,
 } from '@kbn/event-annotation-common';
 import moment from 'moment';
+import {
+  AwaitingDashboardAPI,
+  DashboardCreationOptions,
+  DashboardRenderer,
+} from '@kbn/dashboard-plugin/public';
+import { ViewMode } from '@kbn/embeddable-plugin/public';
 import { LOGS_EXPLORER_LOCATOR_ID, LogsExplorerLocatorParams } from '@kbn/deeplinks-observability';
 import { TimeRange } from '@kbn/es-query';
 import { AlertHistoryChart } from './alert_history';
@@ -110,6 +116,7 @@ export default function AlertDetailsAppSection({ alert, rule, ruleLink }: AppSec
   const {
     charts,
     data,
+    http,
     share: {
       url: { locators },
     },
@@ -129,6 +136,7 @@ export default function AlertDetailsAppSection({ alert, rule, ruleLink }: AppSec
   };
   const alertStart = alert.fields[ALERT_START];
   const alertEnd = alert.fields[ALERT_END];
+  const alertReason = alert.fields[ALERT_REASON];
   const groups = alert.fields[ALERT_GROUP];
   const tags = alert.fields[TAGS];
 
@@ -164,6 +172,9 @@ export default function AlertDetailsAppSection({ alert, rule, ruleLink }: AppSec
 
   const annotations: EventAnnotationConfig[] = [];
   annotations.push(alertStartAnnotation, alertRangeAnnotation);
+
+  const OVERVIEW_TAB_ID = 'overview';
+  const DASHBOARDS_TAB_ID = 'dashboards';
 
   useEffect(() => {
     setTimeRange(getPaddedAlertTimeRange(alertStart!, alertEnd));
@@ -271,8 +282,19 @@ export default function AlertDetailsAppSection({ alert, rule, ruleLink }: AppSec
       });
     }
 
-    setAlertSummaryFields(alertSummaryFields);
-  }, [groups, tags, rule, ruleLink, setAlertSummaryFields, timeRange, alertEnd, viewInAppUrl]);
+    setAlertSummaryFields(summaryFields);
+  }, [
+    groups,
+    tags,
+    rule,
+    ruleLink,
+    http,
+    timeRange,
+    alertStart,
+    alertEnd,
+    alertReason,
+    viewInAppUrl,
+  ]);
 
   useEffect(() => {
     const initDataView = async () => {
