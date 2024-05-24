@@ -197,21 +197,23 @@ function FailedTransactionChart({
               />
             </EuiFlexItem>
           )}
-          <EuiFlexItem>
-            <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
-              <EuiFlexItem grow={false}>
-                <ViewInAPMButton
-                  serviceName={serviceName}
-                  environment={environment}
-                  from={start}
-                  to={end}
-                  kuery={kuery}
-                  transactionName={transactionName}
-                  transactionType={transactionType}
-                />
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlexItem>
+          {!alert && (
+            <EuiFlexItem>
+              <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
+                <EuiFlexItem grow={false}>
+                  <ViewInAPMButton
+                    serviceName={serviceName}
+                    environment={environment}
+                    from={start}
+                    to={end}
+                    kuery={kuery}
+                    transactionName={transactionName}
+                    transactionType={transactionType}
+                  />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiFlexItem>
+          )}
         </EuiFlexGroup>
 
         <TimeseriesChart
