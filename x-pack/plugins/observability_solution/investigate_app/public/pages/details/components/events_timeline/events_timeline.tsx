@@ -22,6 +22,7 @@ import { useFetchEvents } from '../../../../hooks/use_fetch_events';
 import { useInvestigation } from '../../contexts/investigation_context';
 import { useKibana } from '../../../../hooks/use_kibana';
 import { AlertEvent } from './alert_event';
+import { LLMEvent } from './llm_event';
 
 export const EventsTimeLine = () => {
   const { dependencies } = useKibana();
@@ -71,7 +72,7 @@ export const EventsTimeLine = () => {
   const alertEvents = events?.filter((evt) => evt.eventType === 'alert');
   const annotations = events?.filter((evt) => evt.eventType === 'annotation');
 
-  const rcaAnalysisTimelineEvents: EventResponse[] = [];
+  let rcaAnalysisTimelineEvents: EventResponse[] = [];
   const rcaAnalysisEvents = investigation?.automatedRcaAnalysis;
   if (rcaAnalysisEvents && rcaAnalysisEvents.length > 0) {
     const rcaResponseEvent = rcaAnalysisEvents.find(
@@ -81,15 +82,13 @@ export const EventsTimeLine = () => {
       const timelineEvents = rcaResponseEvent.response.timeline?.events;
 
       if (timelineEvents) {
-        rcaAnalysisTimelineEvents.push(
-          timelineEvents.map((e: any) => ({
-            ...e,
-            id: v4(),
-            title: e.description,
-            timestamp: e['@timestamp'],
-            eventType: 'LLM',
-          }))
-        );
+        rcaAnalysisTimelineEvents = timelineEvents.map((e: any) => ({
+          ...e,
+          id: v4(),
+          title: e.description,
+          timestamp: e['@timestamp'],
+          eventType: 'LLM',
+        }));
       }
     }
   }
@@ -138,7 +137,7 @@ export const EventsTimeLine = () => {
         ))}
 
         {rcaAnalysisTimelineEvents?.map((rcaAnalysisTimelineEvent) => (
-          <AlertEvent key={rcaAnalysisTimelineEvent.id} event={rcaAnalysisTimelineEvent} />
+          <LLMEvent key={rcaAnalysisTimelineEvent.id} event={rcaAnalysisTimelineEvent} />
         ))}
 
         <AreaSeries
