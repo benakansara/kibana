@@ -15,7 +15,7 @@ import { Group } from '@kbn/observability-alerting-rule-utils';
 import { ALERT_GROUP } from '@kbn/rule-data-utils';
 import { SERVICE_NAME } from '@kbn/observability-shared-plugin/common';
 import { v4 } from 'uuid';
-import { EventResponse } from '@kbn/investigation-shared';
+import { EventSchema } from '@kbn/investigation-shared';
 import { AnnotationEvent } from './annotation_event';
 import { TIME_LINE_THEME } from './timeline_theme';
 import { useFetchEvents } from '../../../../hooks/use_fetch_events';
@@ -72,7 +72,7 @@ export const EventsTimeLine = () => {
   const alertEvents = events?.filter((evt) => evt.eventType === 'alert');
   const annotations = events?.filter((evt) => evt.eventType === 'annotation');
 
-  let rcaAnalysisTimelineEvents: EventResponse[] = [];
+  let rcaAnalysisTimelineEvents: EventSchema[] = [];
   const rcaAnalysisEvents = investigation?.automatedRcaAnalysis;
   if (rcaAnalysisEvents && rcaAnalysisEvents.length > 0) {
     const rcaResponseEvent = rcaAnalysisEvents.find(
