@@ -8,8 +8,11 @@ import { i18n } from '@kbn/i18n';
 import type { RootCauseAnalysisForServiceEvent } from '@kbn/observability-utils-server/llm/service_rca';
 import { EcsFieldsResponse } from '@kbn/rule-registry-plugin/common';
 import React, { useState } from 'react';
+import { useEffect } from 'react';
+import { EuiButton, EuiSpacer } from '@elastic/eui';
 import { useKibana } from '../../../../hooks/use_kibana';
 import { useInvestigation } from '../../contexts/investigation_context';
+import { useUpdateInvestigation } from '../../../../hooks/use_update_investigation';
 
 export interface InvestigationContextualInsight {
   key: string;
@@ -21,7 +24,11 @@ export function AssistantHypothesis({ investigationId }: { investigationId: stri
   const {
     alert,
     globalParams: { timeRange },
+    investigation,
   } = useInvestigation();
+
+  const { mutateAsync: updateInvestigation } = useUpdateInvestigation();
+
   const {
     core: { notifications },
     services: { investigateAppRepositoryClient },
@@ -37,8 +44,32 @@ export function AssistantHypothesis({ investigationId }: { investigationId: stri
 
   const serviceName = alert?.['service.name'] as string | undefined;
 
-  const [events, setEvents] = useState<RootCauseAnalysisForServiceEvent[]>([]);
+  const [events, setEvents] = useState<RootCauseAnalysisForServiceEvent[]>(
+    investigation?.automatedRcaAnalysis ?? []
+  );
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const updateInvestigationSO = async () => {
+      if (investigation && events.length > 0) {
+        if (
+          events.find(
+            (event) =>
+              'response' in event && 'report' in event.response && 'timeline' in event.response
+          )
+        ) {
+          await updateInvestigation({
+            investigationId: investigationId!,
+            payload: {
+              automatedRcaAnalysis: events,
+            },
+          });
+        }
+      }
+    };
+
+    updateInvestigationSO();
+  }, [events, investigation, investigationId, updateInvestigation]);
 
   const runRootCauseAnalysis = ({
     connectorId,
@@ -95,23 +126,57 @@ export function AssistantHypothesis({ investigationId }: { investigationId: stri
       });
   };
 
+  const startAnalysis = () => {
+    if (alert && selectedConnector && serviceName) {
+      runRootCauseAnalysis({
+        alert,
+        connectorId: selectedConnector,
+        serviceName,
+      });
+    }
+  };
+
+  const restartAnalysis = async () => {
+    setEvents([]);
+
+    if (investigation) {
+      await updateInvestigation({
+        investigationId: investigationId!,
+        payload: {
+          automatedRcaAnalysis: [],
+        },
+      });
+    }
+
+    startAnalysis();
+  };
+
   if (!serviceName) {
     return null;
   }
 
   return (
-    <RootCauseAnalysisContainer
-      events={events}
-      loading={loading || loadingConnector}
-      onStartAnalysisClick={() => {
-        if (alert && selectedConnector && serviceName) {
-          runRootCauseAnalysis({
-            alert,
-            connectorId: selectedConnector,
-            serviceName,
-          });
-        }
-      }}
-    />
+    <>
+      <RootCauseAnalysisContainer
+        events={events}
+        loading={loading || loadingConnector}
+        onStartAnalysisClick={startAnalysis}
+      />
+      {events.length > 0 && !loading && (
+        <>
+          <EuiSpacer size="s" />
+          <EuiButton
+            data-test-subj="observabilityAiAssistantAppRootCauseAnalysisCalloutStartAnalysisButton"
+            iconType="sparkles"
+            fill
+            onClick={restartAnalysis}
+          >
+            {i18n.translate('xpack.investigateApp.rca.calloutText', {
+              defaultMessage: 'Re-run analysis',
+            })}
+          </EuiButton>
+        </>
+      )}
+    </>
   );
 }

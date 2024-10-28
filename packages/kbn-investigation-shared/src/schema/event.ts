@@ -15,6 +15,7 @@ const eventTypeSchema = z.union([
   z.literal('error_rate'),
   z.literal('latency'),
   z.literal('anomaly'),
+  z.literal('LLM'),
 ]);
 
 const annotationEventSchema = z.object({

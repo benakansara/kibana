@@ -14,6 +14,8 @@ import { getBrushData } from '@kbn/observability-utils-browser/chart/utils';
 import { Group } from '@kbn/observability-alerting-rule-utils';
 import { ALERT_GROUP } from '@kbn/rule-data-utils';
 import { SERVICE_NAME } from '@kbn/observability-shared-plugin/common';
+import { v4 } from 'uuid';
+import { EventResponse } from '@kbn/investigation-shared';
 import { AnnotationEvent } from './annotation_event';
 import { TIME_LINE_THEME } from './timeline_theme';
 import { useFetchEvents } from '../../../../hooks/use_fetch_events';
@@ -27,7 +29,7 @@ export const EventsTimeLine = () => {
   const baseTheme = dependencies.start.charts.theme.useChartsBaseTheme();
 
   const { globalParams, updateInvestigationParams } = useInvestigation();
-  const { alert } = useInvestigation();
+  const { alert, investigation } = useInvestigation();
 
   const filter = useMemo(() => {
     const group = (alert?.[ALERT_GROUP] as unknown as Group[])?.find(
@@ -68,6 +70,27 @@ export const EventsTimeLine = () => {
 
   const alertEvents = events?.filter((evt) => evt.eventType === 'alert');
   const annotations = events?.filter((evt) => evt.eventType === 'annotation');
+
+  const rcaAnalysisTimelineEvents: EventResponse[] = [];
+  const rcaAnalysisEvents = investigation?.automatedRcaAnalysis;
+  if (rcaAnalysisEvents && rcaAnalysisEvents.length > 0) {
+    const rcaReportEvent = rcaAnalysisEvents.find(
+      (event: any) =>
+        'response' in event && 'report' in event.response && 'timeline' in event.response
+    );
+    if (rcaReportEvent) {
+      const timelineEvents = rcaReportEvent.response.timeline?.events;
+      rcaAnalysisTimelineEvents.push(
+        timelineEvents?.map((e: any) => ({
+          ...e,
+          id: v4(),
+          title: e.description,
+          timestamp: e['@timestamp'],
+          eventType: 'LLM',
+        }))
+      );
+    }
+  }
 
   return (
     <>
@@ -110,6 +133,10 @@ export const EventsTimeLine = () => {
 
         {annotations?.map((annotation) => (
           <AnnotationEvent key={annotation.id} event={annotation} />
+        ))}
+
+        {rcaAnalysisTimelineEvents?.map((rcaAnalysisTimelineEvent) => (
+          <AlertEvent key={rcaAnalysisTimelineEvent.id} event={rcaAnalysisTimelineEvent} />
         ))}
 
         <AreaSeries
