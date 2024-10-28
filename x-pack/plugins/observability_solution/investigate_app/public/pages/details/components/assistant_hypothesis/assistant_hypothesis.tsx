@@ -8,7 +8,6 @@ import { i18n } from '@kbn/i18n';
 import type { RootCauseAnalysisForServiceEvent } from '@kbn/observability-utils-server/llm/service_rca';
 import { EcsFieldsResponse } from '@kbn/rule-registry-plugin/common';
 import React, { useState } from 'react';
-import { useEffect } from 'react';
 import { EuiButton, EuiSpacer } from '@elastic/eui';
 import { useKibana } from '../../../../hooks/use_kibana';
 import { useInvestigation } from '../../contexts/investigation_context';
@@ -48,28 +47,6 @@ export function AssistantHypothesis({ investigationId }: { investigationId: stri
     investigation?.automatedRcaAnalysis ?? []
   );
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const updateInvestigationSO = async () => {
-      if (investigation && events.length > 0) {
-        if (
-          events.find(
-            (event) =>
-              'response' in event && 'report' in event.response && 'timeline' in event.response
-          )
-        ) {
-          await updateInvestigation({
-            investigationId: investigationId!,
-            payload: {
-              automatedRcaAnalysis: events,
-            },
-          });
-        }
-      }
-    };
-
-    updateInvestigationSO();
-  }, [events, investigation, investigationId, updateInvestigation]);
 
   const runRootCauseAnalysis = ({
     connectorId,
@@ -120,8 +97,24 @@ export function AssistantHypothesis({ investigationId }: { investigationId: stri
           });
           setLoading(false);
         },
-        complete: () => {
+        complete: async () => {
           setLoading(false);
+
+          if (investigation && events.length > 0) {
+            if (
+              events.find(
+                (event) =>
+                  'response' in event && 'report' in event.response && 'timeline' in event.response
+              )
+            ) {
+              await updateInvestigation({
+                investigationId: investigationId!,
+                payload: {
+                  automatedRcaAnalysis: events,
+                },
+              });
+            }
+          }
         },
       });
   };
