@@ -74,21 +74,23 @@ export const EventsTimeLine = () => {
   const rcaAnalysisTimelineEvents: EventResponse[] = [];
   const rcaAnalysisEvents = investigation?.automatedRcaAnalysis;
   if (rcaAnalysisEvents && rcaAnalysisEvents.length > 0) {
-    const rcaReportEvent = rcaAnalysisEvents.find(
-      (event: any) =>
-        'response' in event && 'report' in event.response && 'timeline' in event.response
+    const rcaResponseEvent = rcaAnalysisEvents.find(
+      (event) => 'response' in event && 'report' in event.response && 'timeline' in event.response
     );
-    if (rcaReportEvent) {
-      const timelineEvents = rcaReportEvent.response.timeline?.events;
-      rcaAnalysisTimelineEvents.push(
-        timelineEvents?.map((e: any) => ({
-          ...e,
-          id: v4(),
-          title: e.description,
-          timestamp: e['@timestamp'],
-          eventType: 'LLM',
-        }))
-      );
+    if (rcaResponseEvent) {
+      const timelineEvents = rcaResponseEvent.response.timeline?.events;
+
+      if (timelineEvents) {
+        rcaAnalysisTimelineEvents.push(
+          timelineEvents.map((e: any) => ({
+            ...e,
+            id: v4(),
+            title: e.description,
+            timestamp: e['@timestamp'],
+            eventType: 'LLM',
+          }))
+        );
+      }
     }
   }
 
