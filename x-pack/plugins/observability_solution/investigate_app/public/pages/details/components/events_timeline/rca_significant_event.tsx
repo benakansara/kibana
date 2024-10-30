@@ -11,7 +11,7 @@ import React from 'react';
 import moment from 'moment';
 import { EventSchema } from '@kbn/investigation-shared';
 
-export const LLMEvent = ({ event }: { event: EventSchema }) => {
+export const RcaSignificantEvent = ({ event }: { event: EventSchema }) => {
   return (
     <LineAnnotation
       id={event.id}

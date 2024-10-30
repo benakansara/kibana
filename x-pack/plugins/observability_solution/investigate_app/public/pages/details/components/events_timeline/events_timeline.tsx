@@ -22,7 +22,7 @@ import { useFetchEvents } from '../../../../hooks/use_fetch_events';
 import { useInvestigation } from '../../contexts/investigation_context';
 import { useKibana } from '../../../../hooks/use_kibana';
 import { AlertEvent } from './alert_event';
-import { LLMEvent } from './llm_event';
+import { RcaSignificantEvent } from './rca_significant_event';
 
 export const EventsTimeLine = () => {
   const { dependencies } = useKibana();
@@ -73,7 +73,7 @@ export const EventsTimeLine = () => {
   const annotations = events?.filter((evt) => evt.eventType === 'annotation');
 
   let rcaAnalysisTimelineEvents: EventSchema[] = [];
-  const rcaAnalysisEvents = investigation?.automatedRcaAnalysis;
+  const rcaAnalysisEvents = investigation?.automatedRcaAnalysis?.events;
   if (rcaAnalysisEvents && rcaAnalysisEvents.length > 0) {
     const rcaResponseEvent = rcaAnalysisEvents.find(
       (event) => 'response' in event && 'report' in event.response && 'timeline' in event.response
@@ -137,7 +137,7 @@ export const EventsTimeLine = () => {
         ))}
 
         {rcaAnalysisTimelineEvents?.map((rcaAnalysisTimelineEvent) => (
-          <LLMEvent key={rcaAnalysisTimelineEvent.id} event={rcaAnalysisTimelineEvent} />
+          <RcaSignificantEvent key={rcaAnalysisTimelineEvent.id} event={rcaAnalysisTimelineEvent} />
         ))}
 
         <AreaSeries

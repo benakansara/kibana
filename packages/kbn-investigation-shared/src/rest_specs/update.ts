@@ -24,7 +24,7 @@ const updateInvestigationParamsSchema = z.object({
       }),
       tags: z.array(z.string()),
       externalIncidentUrl: z.string().nullable(),
-      automatedRcaAnalysis: z.array(z.any()).optional(),
+      automatedRcaAnalysis: z.object({ events: z.array(z.any()) }).optional(),
     })
     .partial(),
 });
