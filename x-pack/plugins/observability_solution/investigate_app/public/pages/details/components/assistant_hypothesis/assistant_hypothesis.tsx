@@ -121,7 +121,7 @@ export function AssistantHypothesis({ investigationId }: { investigationId: stri
           });
           setLoading(false);
         },
-        complete: async () => {
+        complete: () => {
           setLoading(false);
         },
       });
