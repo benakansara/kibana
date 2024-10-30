@@ -87,7 +87,7 @@ export const EventsTimeLine = () => {
           id: v4(),
           title: e.description,
           timestamp: e['@timestamp'],
-          eventType: 'LLM',
+          eventType: 'rca',
         }));
       }
     }
