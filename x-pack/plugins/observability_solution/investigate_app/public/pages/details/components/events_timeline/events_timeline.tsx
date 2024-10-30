@@ -22,7 +22,7 @@ import { useFetchEvents } from '../../../../hooks/use_fetch_events';
 import { useInvestigation } from '../../contexts/investigation_context';
 import { useKibana } from '../../../../hooks/use_kibana';
 import { AlertEvent } from './alert_event';
-import { RcaSignificantEvent } from './rca_significant_event';
+import { RootCauseAnalysisEvent } from './root_cause_analysis_event';
 
 export const EventsTimeLine = () => {
   const { dependencies } = useKibana();
@@ -137,7 +137,10 @@ export const EventsTimeLine = () => {
         ))}
 
         {rcaAnalysisTimelineEvents?.map((rcaAnalysisTimelineEvent) => (
-          <RcaSignificantEvent key={rcaAnalysisTimelineEvent.id} event={rcaAnalysisTimelineEvent} />
+          <RootCauseAnalysisEvent
+            key={rcaAnalysisTimelineEvent.id}
+            event={rcaAnalysisTimelineEvent}
+          />
         ))}
 
         <AreaSeries
