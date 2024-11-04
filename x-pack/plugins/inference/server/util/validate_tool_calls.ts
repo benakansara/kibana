@@ -6,15 +6,12 @@
  */
 import Ajv from 'ajv';
 import {
-  createToolNotFoundError,
-  createToolValidationError,
-} from '../../common/chat_complete/errors';
-import {
   ToolCallsOf,
   ToolChoiceType,
   ToolOptions,
   UnvalidatedToolCall,
-} from '../../common/chat_complete/tools';
+} from '@kbn/inference-common';
+import { createToolNotFoundError, createToolValidationError } from '../chat_complete/errors';
 
 export function validateToolCalls<TToolOptions extends ToolOptions>({
   toolCalls,
@@ -57,11 +54,12 @@ export function validateToolCalls<TToolOptions extends ToolOptions>({
 
     if (!valid) {
       throw createToolValidationError(
-        `Tool call arguments for ${toolCall.function.name} were invalid`,
+        `Tool call arguments for ${toolCall.function.name} (${toolCall.toolCallId}) were invalid`,
         {
           name: toolCall.function.name,
           errorsText: validator.errorsText(),
           arguments: toolCall.function.arguments,
+          toolCalls,
         }
       );
     }

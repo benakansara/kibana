@@ -11,7 +11,7 @@
     "typings/**/*",
     "public/**/*.json",
     "server/**/*",
-    ".storybook/**/*.{ts,tsx}"
+    ".storybook/**/*.tsx"
   ],
   "kbn_references": [
     "@kbn/es-types",
@@ -75,6 +75,9 @@
     "@kbn/slo-plugin",
     "@kbn/spaces-plugin",
     "@kbn/data-service",
+    "@kbn/inference-common",
+    "@kbn/observability-ai-server",
+    "@kbn/observability-ai-common",
   ],
   "exclude": [
     "target/**/*"

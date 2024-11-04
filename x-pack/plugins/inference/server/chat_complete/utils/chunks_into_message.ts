@@ -5,16 +5,17 @@
  * 2.0.
  */
 
-import { last, map, merge, OperatorFunction, scan, share } from 'rxjs';
-import type { Logger } from '@kbn/logging';
-import type { UnvalidatedToolCall, ToolOptions } from '../../../common/chat_complete/tools';
 import {
   ChatCompletionChunkEvent,
   ChatCompletionEventType,
   ChatCompletionMessageEvent,
   ChatCompletionTokenCountEvent,
-} from '../../../common/chat_complete';
-import { withoutTokenCountEvents } from '../../../common/chat_complete/without_token_count_events';
+  ToolOptions,
+  UnvalidatedToolCall,
+  withoutTokenCountEvents,
+} from '@kbn/inference-common';
+import type { Logger } from '@kbn/logging';
+import { OperatorFunction, map, merge, share, toArray } from 'rxjs';
 import { validateToolCalls } from '../../util/validate_tool_calls';
 
 export function chunksIntoMessage<TToolOptions extends ToolOptions>({
@@ -36,38 +37,36 @@ export function chunksIntoMessage<TToolOptions extends ToolOptions>({
       shared$,
       shared$.pipe(
         withoutTokenCountEvents(),
-        scan(
-          (prev, chunk) => {
-            prev.content += chunk.content ?? '';
+        toArray(),
+        map((chunks): ChatCompletionMessageEvent<TToolOptions> => {
+          const concatenatedChunk = chunks.reduce(
+            (prev, chunk) => {
+              prev.content += chunk.content ?? '';
 
-            chunk.tool_calls?.forEach((toolCall) => {
-              let prevToolCall = prev.tool_calls[toolCall.index];
-              if (!prevToolCall) {
-                prev.tool_calls[toolCall.index] = {
-                  function: {
-                    name: '',
-                    arguments: '',
-                  },
-                  toolCallId: '',
-                };
+              chunk.tool_calls?.forEach((toolCall) => {
+                let prevToolCall = prev.tool_calls[toolCall.index];
+                if (!prevToolCall) {
+                  prev.tool_calls[toolCall.index] = {
+                    function: {
+                      name: '',
+                      arguments: '',
+                    },
+                    toolCallId: '',
+                  };
 
-                prevToolCall = prev.tool_calls[toolCall.index];
-              }
+                  prevToolCall = prev.tool_calls[toolCall.index];
+                }
 
-              prevToolCall.function.name += toolCall.function.name;
-              prevToolCall.function.arguments += toolCall.function.arguments;
-              prevToolCall.toolCallId += toolCall.toolCallId;
-            });
+                prevToolCall.function.name += toolCall.function.name;
+                prevToolCall.function.arguments += toolCall.function.arguments;
+                prevToolCall.toolCallId += toolCall.toolCallId;
+              });
 
-            return prev;
-          },
-          {
-            content: '',
-            tool_calls: [] as UnvalidatedToolCall[],
-          }
-        ),
-        last(),
-        map((concatenatedChunk): ChatCompletionMessageEvent<TToolOptions> => {
+              return prev;
+            },
+            { content: '', tool_calls: [] as UnvalidatedToolCall[] }
+          );
+
           logger.debug(() => `Received completed message: ${JSON.stringify(concatenatedChunk)}`);
 
           const validatedToolCalls = validateToolCalls<TToolOptions>({

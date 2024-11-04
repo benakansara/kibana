@@ -20,10 +20,10 @@ import {
   ChatCompletionEventType,
   Message,
   MessageRole,
-} from '../../../../common/chat_complete';
-import type { ToolOptions } from '../../../../common/chat_complete/tools';
-import { createTokenLimitReachedError } from '../../../../common/chat_complete/errors';
-import { createInferenceInternalError } from '../../../../common/errors';
+  ToolOptions,
+  createInferenceInternalError,
+} from '@kbn/inference-common';
+import { createTokenLimitReachedError } from '../../errors';
 import { eventSourceStreamIntoObservable } from '../../../util/event_source_stream_into_observable';
 import type { InferenceConnectorAdapter } from '../../types';
 import {
@@ -47,7 +47,6 @@ export const openAIAdapter: InferenceConnectorAdapter = {
       request = {
         stream,
         messages: messagesToOpenAI({ system: wrapped.system, messages: wrapped.messages }),
-        temperature: 0,
       };
     } else {
       request = {
@@ -55,7 +54,6 @@ export const openAIAdapter: InferenceConnectorAdapter = {
         messages: messagesToOpenAI({ system, messages }),
         tool_choice: toolChoiceToOpenAI(toolChoice),
         tools: toolsToOpenAI(tools),
-        temperature: 0,
       };
     }
 

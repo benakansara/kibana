@@ -5,11 +5,19 @@
  * 2.0.
  */
 import { i18n } from '@kbn/i18n';
-import type { RootCauseAnalysisForServiceEvent } from '@kbn/observability-utils-server/llm/service_rca';
+import type { RootCauseAnalysisEvent } from '@kbn/observability-ai-server/root_cause_analysis';
 import { EcsFieldsResponse } from '@kbn/rule-registry-plugin/common';
-import React, { useState } from 'react';
-import { useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { omit } from 'lodash';
 import { EuiButton, EuiSpacer } from '@elastic/eui';
+import {
+  ALERT_FLAPPING_HISTORY,
+  ALERT_RULE_EXECUTION_TIMESTAMP,
+  ALERT_RULE_EXECUTION_UUID,
+  EVENT_ACTION,
+  EVENT_KIND,
+} from '@kbn/rule-registry-plugin/common/technical_rule_data_field_names';
+import { isRequestAbortedError } from '@kbn/server-route-repository-client';
 import { useKibana } from '../../../../hooks/use_kibana';
 import { useInvestigation } from '../../contexts/investigation_context';
 import { useUpdateInvestigation } from '../../../../hooks/use_update_investigation';
@@ -44,11 +52,12 @@ export function AssistantHypothesis({ investigationId }: { investigationId: stri
 
   const serviceName = alert?.['service.name'] as string | undefined;
 
-  const [events, setEvents] = useState<RootCauseAnalysisForServiceEvent[]>(
-    investigation?.automatedRcaAnalysis?.events ?? []
-  );
-
+  const [events, setEvents] = useState<RootCauseAnalysisEvent[]>(investigation?.automatedRcaAnalysis?.events ?? []);
+  
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
+
+  const controllerRef = useRef(new AbortController());
 
   useEffect(() => {
     const updateInvestigationSO = async () => {
@@ -73,6 +82,7 @@ export function AssistantHypothesis({ investigationId }: { investigationId: stri
   }, [events, investigation, investigationId, updateInvestigation]);
 
   const runRootCauseAnalysis = ({
+    alert: nonNullishAlert,
     connectorId,
     serviceName: nonNullishServiceName,
   }: {
@@ -84,9 +94,11 @@ export function AssistantHypothesis({ investigationId }: { investigationId: stri
 
     const rangeTo = timeRange.to;
 
-    const signal = new AbortController().signal;
-
     setLoading(true);
+
+    setError(undefined);
+
+    setEvents([]);
 
     investigateAppRepositoryClient
       .stream('POST /internal/observability/investigation/root_cause_analysis', {
@@ -96,32 +108,49 @@ export function AssistantHypothesis({ investigationId }: { investigationId: stri
             context: `The user is investigating an alert for the ${serviceName} service,
             and wants to find the root cause. Here is the alert:
 
-            ${JSON.stringify(alert)}`,
+            ${JSON.stringify(sanitizeAlert(nonNullishAlert))}`,
             rangeFrom,
             rangeTo,
             serviceName: nonNullishServiceName,
           },
         },
-        signal,
+        signal: controllerRef.current.signal,
       })
       .subscribe({
         next: (event) => {
+          // console.log(event);
           setEvents((prev) => {
-            if ('type' in event.event && event.event.type === 'chatCompletionChunk') {
-              return prev;
-            }
             return prev.concat(event.event);
           });
         },
-        error: (error) => {
-          notifications.toasts.addError(error, {
-            title: i18n.translate('xpack.investigateApp.assistantHypothesis.failedToLoadAnalysis', {
-              defaultMessage: `Failed to load analysis`,
-            }),
-          });
+        error: (nextError) => {
+          if (!isRequestAbortedError(nextError)) {
+            notifications.toasts.addError(nextError, {
+              title: i18n.translate(
+                'xpack.investigateApp.assistantHypothesis.failedToLoadAnalysis',
+                {
+                  defaultMessage: `Failed to load analysis`,
+                }
+              ),
+            });
+            setError(nextError);
+          } else {
+            setError(
+              new Error(
+                i18n.translate('xpack.investigateApp.assistantHypothesis.analysisAborted', {
+                  defaultMessage: `Analysis was aborted`,
+                })
+              )
+            );
+          }
+
           setLoading(false);
         },
         complete: () => {
+          setEvents((prev) => {
+            // console.log('done', prev);
+            return prev;
+          });
           setLoading(false);
         },
       });
@@ -157,23 +186,46 @@ export function AssistantHypothesis({ investigationId }: { investigationId: stri
       <RootCauseAnalysisContainer
         events={events}
         loading={loading || loadingConnector}
+        onStopAnalysisClick={() => {
+          controllerRef.current.abort();
+          controllerRef.current = new AbortController();
+        }}
+        onResetAnalysisClick={() => {
+          controllerRef.current.abort();
+          controllerRef.current = new AbortController();
+          startAnalysis();
+        }}
+        error={error}
         onStartAnalysisClick={startAnalysis}
       />
       {events.length > 0 && !loading && (
         <>
           <EuiSpacer size="s" />
           <EuiButton
-            data-test-subj="observabilityAiAssistantAppRootCauseAnalysisCalloutStartAnalysisButton"
+            data-test-subj="rootCauseAnalysisRerunAnalysisButton"
             iconType="sparkles"
             fill
             onClick={startAnalysis}
           >
-            {i18n.translate('xpack.investigateApp.rca.calloutText', {
+            {i18n.translate('xpack.investigateApp.rca.rerunAnalysisButtonText', {
               defaultMessage: 'Re-run analysis',
             })}
           </EuiButton>
         </>
       )}
     </>
+  );
+}
+
+function sanitizeAlert(alert: EcsFieldsResponse) {
+  return omit(
+    alert,
+    ALERT_RULE_EXECUTION_TIMESTAMP,
+    '_index',
+    ALERT_FLAPPING_HISTORY,
+    EVENT_ACTION,
+    EVENT_KIND,
+    ALERT_RULE_EXECUTION_UUID,
+    '@timestamp'
   );
 }

@@ -76,5 +76,8 @@
     "@kbn/slo-plugin",
     "@kbn/spaces-plugin",
     "@kbn/observability-alerting-rule-utils",
+    "@kbn/apm-data-access-plugin",
+    "@kbn/observability-ai-server",
+    "@kbn/inference-common",
   ],
 }

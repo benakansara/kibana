@@ -34,6 +34,7 @@ interface Dependencies {
   logger: Logger;
   taskManagerStart: TaskManagerStartContract;
   getModelId: () => Promise<string>;
+  enabled: boolean;
 }
 
 export interface RecalledEntry {
@@ -92,6 +93,9 @@ export class KnowledgeBaseService {
   }
 
   setup = async () => {
+    if (!this.dependencies.enabled) {
+      return;
+    }
     const elserModelId = await this.dependencies.getModelId();
 
     const retryOptions = { factor: 1, minTimeout: 10000, retries: 12 };
@@ -113,9 +117,9 @@ export class KnowledgeBaseService {
       } catch (error) {
         if (isModelMissingOrUnavailableError(error)) {
           return false;
-        } else {
-          throw error;
         }
+
+        throw error;
       }
     };
 
@@ -202,6 +206,9 @@ export class KnowledgeBaseService {
   };
 
   private ensureTaskScheduled() {
+    if (!this.dependencies.enabled) {
+      return;
+    }
     this.dependencies.taskManagerStart
       .ensureScheduled({
         taskType: INDEX_QUEUED_DOCUMENTS_TASK_TYPE,
@@ -251,7 +258,7 @@ export class KnowledgeBaseService {
   }
 
   async processQueue() {
-    if (!this._queue.length) {
+    if (!this._queue.length || !this.dependencies.enabled) {
       return;
     }
 
@@ -305,6 +312,9 @@ export class KnowledgeBaseService {
   }
 
   status = async () => {
+    if (!this.dependencies.enabled) {
+      return { ready: false, enabled: false };
+    }
     const elserModelId = await this.dependencies.getModelId();
 
     try {
@@ -320,11 +330,13 @@ export class KnowledgeBaseService {
         deployment_state: deploymentState,
         allocation_state: allocationState,
         model_name: elserModelId,
+        enabled: true,
       };
     } catch (error) {
       return {
         error: error instanceof errors.ResponseError ? error.body.error : String(error),
         ready: false,
+        enabled: true,
         model_name: elserModelId,
       };
     }
@@ -392,6 +404,7 @@ export class KnowledgeBaseService {
     namespace,
     esClient,
     uiSettingsClient,
+    limit = {},
   }: {
     queries: Array<{ text: string; boost?: number }>;
     categories?: string[];
@@ -399,9 +412,13 @@ export class KnowledgeBaseService {
     namespace: string;
     esClient: { asCurrentUser: ElasticsearchClient; asInternalUser: ElasticsearchClient };
     uiSettingsClient: IUiSettingsClient;
+    limit?: { tokens?: number; size?: number };
   }): Promise<{
     entries: RecalledEntry[];
   }> => {
+    if (!this.dependencies.enabled) {
+      return { entries: [] };
+    }
     this.dependencies.logger.debug(
       () => `Recalling entries from KB for queries: "${JSON.stringify(queries)}"`
     );
@@ -444,9 +461,9 @@ export class KnowledgeBaseService {
       documentsFromKb.concat(documentsFromConnectors),
       'score',
       'desc'
-    ).slice(0, 20);
+    ).slice(0, limit.size ?? 20);
 
-    const MAX_TOKENS = 4000;
+    const maxTokens = limit.tokens ?? 4_000;
 
     let tokenCount = 0;
 
@@ -455,7 +472,7 @@ export class KnowledgeBaseService {
     for (const entry of sortedEntries) {
       returnedEntries.push(entry);
       tokenCount += encode(entry.text).length;
-      if (tokenCount >= MAX_TOKENS) {
+      if (tokenCount >= maxTokens) {
         break;
       }
     }
@@ -474,6 +491,9 @@ export class KnowledgeBaseService {
     namespace: string,
     user?: { name: string }
   ): Promise<Array<Instruction & { public?: boolean }>> => {
+    if (!this.dependencies.enabled) {
+      return [];
+    }
     try {
       const response = await this.dependencies.esClient.asInternalUser.search<KnowledgeBaseEntry>({
         index: resourceNames.aliases.kb,
@@ -514,6 +534,9 @@ export class KnowledgeBaseService {
     sortBy?: string;
     sortDirection?: 'asc' | 'desc';
   }): Promise<{ entries: KnowledgeBaseEntry[] }> => {
+    if (!this.dependencies.enabled) {
+      return { entries: [] };
+    }
     try {
       const response = await this.dependencies.esClient.asInternalUser.search<KnowledgeBaseEntry>({
         index: resourceNames.aliases.kb,
@@ -578,6 +601,9 @@ export class KnowledgeBaseService {
     user?: { name: string; id?: string };
     namespace?: string;
   }) => {
+    if (!this.dependencies.enabled) {
+      return null;
+    }
     const res = await this.dependencies.esClient.asInternalUser.search<
       Pick<KnowledgeBaseEntry, 'doc_id'>
     >({
@@ -607,6 +633,9 @@ export class KnowledgeBaseService {
     user?: { name: string; id?: string };
     namespace?: string;
   }): Promise<void> => {
+    if (!this.dependencies.enabled) {
+      return;
+    }
     // for now we want to limit the number of user instructions to 1 per user
     if (document.type === KnowledgeBaseType.UserInstruction) {
       const existingId = await this.getExistingUserInstructionId({
@@ -647,6 +676,9 @@ export class KnowledgeBaseService {
   }: {
     operations: KnowledgeBaseEntryOperation[];
   }): Promise<void> => {
+    if (!this.dependencies.enabled) {
+      return;
+    }
     this.dependencies.logger.info(`Starting import of ${operations.length} entries`);
 
     const limiter = pLimit(5);

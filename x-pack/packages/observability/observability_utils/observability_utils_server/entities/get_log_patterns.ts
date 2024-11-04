@@ -16,7 +16,9 @@ import {
 import { categorizationAnalyzer } from '@kbn/aiops-log-pattern-analysis';
 import { ChangePointType } from '@kbn/es-types/src';
 import { pValueToLabel } from '@kbn/observability-utils-common/ml/p_value_to_label';
-import { partition } from 'lodash';
+import { calculateAuto } from '@kbn/calculate-auto';
+import { orderBy, partition, uniqBy } from 'lodash';
+import moment from 'moment';
 import { ObservabilityElasticsearchClient } from '../es/client/create_observability_es_client';
 import { kqlQuery } from '../es/queries/kql_query';
 import { rangeQuery } from '../es/queries/range_query';
@@ -36,11 +38,10 @@ interface FieldPatternResultBase {
 interface FieldPatternResultChanges {
   timeseries: Array<{ x: number; y: number }>;
   change: {
+    timestamp?: string;
     significance: 'high' | 'medium' | 'low' | null;
     type: ChangePointType;
     change_point?: number;
-    r_value?: number;
-    trend?: string;
     p_value?: number;
   };
 }
@@ -144,7 +145,9 @@ export async function runCategorizeTextAggregation({
                       min: start,
                       max: end,
                     },
-                    fixed_interval: `${Math.round((end - start) / 50)}ms`,
+                    fixed_interval: `${calculateAuto
+                      .atLeast(30, moment.duration(end - start, 'ms'))!
+                      .asMilliseconds()}ms`,
                   },
                 },
                 changes: {
@@ -224,14 +227,21 @@ export async function runCategorizeTextAggregation({
                 x: dateBucket.key,
                 y: dateBucket.doc_count,
               })),
-              change: Object.entries(bucket.changes.type).map(([changePointType, change]) => {
-                return {
-                  key: bucket.changes.bucket?.key,
-                  type: changePointType,
-                  significance: change.p_value !== undefined ? pValueToLabel(change.p_value) : null,
-                  ...change,
-                };
-              })[0],
+              change: Object.entries(bucket.changes.type).map(
+                ([changePointType, change]): FieldPatternResultChanges['change'] => {
+                  return {
+                    type: changePointType as ChangePointType,
+                    significance:
+                      change.p_value !== undefined ? pValueToLabel(change.p_value) : null,
+                    change_point: change.change_point,
+                    p_value: change.p_value,
+                    timestamp:
+                      change.change_point !== undefined
+                        ? bucket.timeseries.buckets[change.change_point].key_as_string
+                        : undefined,
+                  };
+                }
+              )[0],
             }
           : {}),
       };
@@ -376,5 +386,8 @@ export async function getLogPatterns({
     })
   );
 
-  return allPatterns.flat();
+  return uniqBy(
+    orderBy(allPatterns.flat(), (pattern) => pattern.count, 'desc'),
+    (pattern) => pattern.sample
+  );
 }

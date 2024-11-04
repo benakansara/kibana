@@ -9,17 +9,17 @@ import type { Logger } from '@kbn/logging';
 import type { KibanaRequest } from '@kbn/core-http-server';
 import type { InferenceClient, InferenceStartDependencies } from '../types';
 import { createChatCompleteApi } from '../chat_complete';
-import { createOutputApi } from '../../common/output/create_output_api';
+import { createOutputApi } from '../../common/create_output_api';
 import { getConnectorById } from '../util/get_connector_by_id';
 
 export function createInferenceClient({
   request,
   actions,
   logger,
-}: { request: KibanaRequest; logger: Logger } & Pick<
-  InferenceStartDependencies,
-  'actions'
->): InferenceClient {
+}: {
+  request: KibanaRequest;
+  logger: Logger;
+} & Pick<InferenceStartDependencies, 'actions'>): InferenceClient {
   const chatComplete = createChatCompleteApi({ request, actions, logger });
   return {
     chatComplete,
