@@ -91,13 +91,13 @@ const hasFirehoseDataRoute = createObservabilityOnboardingServerRoute({
   endpoint: 'GET /internal/observability_onboarding/firehose/has-data',
   params: t.type({
     query: t.type({
-      streamName: t.string,
+      logsStreamName: t.string,
       stackName: t.string,
     }),
   }),
   options: { tags: [] },
   async handler(resources): Promise<HasFirehoseDataRouteResponse> {
-    const { streamName, stackName } = resources.params.query;
+    const { logsStreamName, stackName } = resources.params.query;
     const { elasticsearch } = await resources.context.core;
     const indexPatternList = AWS_INDEX_NAME_LIST.map((index) => `${index}-*`);
 
@@ -115,7 +115,7 @@ const hasFirehoseDataRoute = createObservabilityOnboardingServerRoute({
         query: {
           bool: {
             should: [
-              ...termQuery('aws.kinesis.name', streamName),
+              ...termQuery('aws.kinesis.name', logsStreamName),
               ...wildcardQuery('aws.exporter.arn', stackName),
             ],
           },
