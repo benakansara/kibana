@@ -60,8 +60,7 @@
       "kibanaReact",
       "ml",
       "embeddable",
-      "controls",
-      "stackAlerts"
+      "controls"
     ]
   }
 }

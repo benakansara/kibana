@@ -21,7 +21,6 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
   const listingTable = getService('listingTable');
   const kibanaServer = getService('kibanaServer');
   const find = getService('find');
-  const indexPattern = 'log*';
 
   const hasFocus = async (testSubject: string) => {
     const targetElement = await testSubjects.find(testSubject);
@@ -49,7 +48,6 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
       await visualize.navigateToNewVisualization();
       await visualize.clickVisType('lens');
       await timePicker.ensureHiddenNoDataPopover();
-      await visualize.selectIndexPattern(indexPattern);
       await a11y.testAppSnapshot();
     });
 
@@ -57,7 +55,6 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
       await visualize.navigateToNewVisualization();
       await visualize.clickVisType('lens');
       await timePicker.ensureHiddenNoDataPopover();
-      await visualize.selectIndexPattern(indexPattern);
       await lens.goToTimeRange();
 
       await lens.configureDimension({
@@ -117,7 +114,6 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
       await visualize.navigateToNewVisualization();
       await visualize.clickVisType('lens');
       await timePicker.ensureHiddenNoDataPopover();
-      await visualize.selectIndexPattern(indexPattern);
       await lens.goToTimeRange();
 
       await lens.openDimensionEditor('lnsXY_xDimensionPanel > lns-empty-dimension');
@@ -197,7 +193,6 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
       it('should focus the added layer', async () => {
         await visualize.navigateToNewVisualization();
         await visualize.clickVisType('lens');
-        await visualize.selectIndexPattern(indexPattern);
         await lens.createLayer();
         expect(await hasFocus('lns-layerPanel-1')).to.be(true);
       });

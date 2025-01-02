@@ -169,8 +169,7 @@ export interface DataViewsServicePublicMethods {
     spec: DataViewSpec,
     override?: boolean,
     skipFetchFields?: boolean,
-    displayErrors?: boolean,
-    setAsDefault?: boolean
+    displayErrors?: boolean
   ) => Promise<DataView>;
   /**
    * Save data view
@@ -1220,14 +1219,11 @@ export class DataViewsService {
     spec: DataViewSpec,
     overwrite = false,
     skipFetchFields = false,
-    displayErrors = true,
-    setAsDefault = true
+    displayErrors = true
   ) {
     const dataView = await this.createFromSpec(spec, skipFetchFields, displayErrors);
     await this.createSavedObject(dataView, overwrite);
-    if (setAsDefault) {
-      await this.setDefault(dataView.id!);
-    }
+    await this.setDefault(dataView.id!);
     return dataView;
   }
 

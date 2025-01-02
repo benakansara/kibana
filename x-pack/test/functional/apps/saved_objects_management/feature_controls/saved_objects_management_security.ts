@@ -78,8 +78,6 @@ export default function ({ getPageObjects, getService }: FtrProviderContext) {
           const objects = await PageObjects.savedObjects.getRowTitles();
           expect(objects.sort()).to.eql(
             [
-              'Log Threshold Alerting Rule Source',
-              'Metric AND Inventory Threshold Alerting Rule Source',
               'logstash-*',
               'A Pie',
               'A Dashboard',
@@ -93,14 +91,6 @@ export default function ({ getPageObjects, getService }: FtrProviderContext) {
           const bools = await PageObjects.savedObjects.getTableSummary();
           expect(bools.sort((a, b) => a.title.localeCompare(b.title))).to.eql(
             [
-              {
-                title: 'Log Threshold Alerting Rule Source',
-                canViewInApp: true,
-              },
-              {
-                title: 'Metric AND Inventory Threshold Alerting Rule Source',
-                canViewInApp: true,
-              },
               {
                 title: 'logstash-*',
                 canViewInApp: true,
@@ -216,8 +206,6 @@ export default function ({ getPageObjects, getService }: FtrProviderContext) {
           const objects = await PageObjects.savedObjects.getRowTitles();
           expect(objects.sort()).to.eql(
             [
-              'Log Threshold Alerting Rule Source',
-              'Metric AND Inventory Threshold Alerting Rule Source',
               'logstash-*',
               'A Pie',
               'A Dashboard',
@@ -231,14 +219,6 @@ export default function ({ getPageObjects, getService }: FtrProviderContext) {
           const bools = await PageObjects.savedObjects.getTableSummary();
           expect(bools.sort((a, b) => a.title.localeCompare(b.title))).to.eql(
             [
-              {
-                title: 'Log Threshold Alerting Rule Source',
-                canViewInApp: false,
-              },
-              {
-                title: 'Metric AND Inventory Threshold Alerting Rule Source',
-                canViewInApp: false,
-              },
               {
                 title: 'logstash-*',
                 canViewInApp: false,

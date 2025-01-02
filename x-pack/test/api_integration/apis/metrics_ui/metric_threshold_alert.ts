@@ -14,6 +14,7 @@ import {
   MetricExpressionParams,
   NonCountMetricExpressionParams,
 } from '@kbn/infra-plugin/common/alerting/metrics';
+import { InfraSource } from '@kbn/infra-plugin/common/source_configuration/source_configuration';
 import {
   EvaluatedRuleParams,
   evaluateRule,
@@ -47,8 +48,36 @@ export default function ({ getService }: FtrProviderContext) {
     ],
   };
 
-  const dataViewIndexPattern = 'alerts-test-data';
-  const timeFieldName = '@timestamp';
+  const configuration: InfraSource['configuration'] = {
+    name: 'Default',
+    description: '',
+    logIndices: {
+      type: 'index_pattern',
+      indexPatternId: 'some-test-id',
+    },
+    metricAlias: 'alerts-test-data',
+    inventoryDefaultView: 'default',
+    metricsExplorerDefaultView: 'default',
+    anomalyThreshold: 70,
+    logColumns: [
+      {
+        timestampColumn: {
+          id: '5e7f964a-be8a-40d8-88d2-fbcfbdca0e2f',
+        },
+      },
+      {
+        fieldColumn: {
+          id: ' eb9777a8-fcd3-420e-ba7d-172fff6da7a2',
+          field: 'event.dataset',
+        },
+      },
+      {
+        messageColumn: {
+          id: 'b645d6da-824b-4723-9a2a-e8cece1645c0',
+        },
+      },
+    ],
+  };
 
   describe('Metric Threshold Alerts Executor', () => {
     describe('with 10K plus docs', () => {
@@ -68,12 +97,15 @@ export default function ({ getService }: FtrProviderContext) {
               } as CountMetricExpressionParams,
             ],
           };
+          const config = {
+            ...configuration,
+            metricAlias: 'filebeat-*',
+          };
           const timeFrame = { end: DATES.ten_thousand_plus.max };
           const results = await evaluateRule(
             esClient,
             params,
-            'filebeat-*',
-            timeFieldName,
+            config,
             10000,
             true,
             logger,
@@ -126,12 +158,15 @@ export default function ({ getService }: FtrProviderContext) {
               } as CustomMetricExpressionParams,
             ],
           };
+          const config = {
+            ...configuration,
+            metricAlias: 'filebeat-*',
+          };
           const timeFrame = { end: DATES.ten_thousand_plus.max };
           const results = await evaluateRule(
             esClient,
             params,
-            'filebeat-*',
-            timeFieldName,
+            config,
             10000,
             true,
             logger,
@@ -187,12 +222,15 @@ export default function ({ getService }: FtrProviderContext) {
               } as CountMetricExpressionParams,
             ],
           };
+          const config = {
+            ...configuration,
+            metricAlias: 'filebeat-*',
+          };
           const timeFrame = { end: DATES.ten_thousand_plus.max };
           const results = await evaluateRule(
             esClient,
             params,
-            'filebeat-*',
-            timeFieldName,
+            config,
             10000,
             true,
             logger,
@@ -240,12 +278,15 @@ export default function ({ getService }: FtrProviderContext) {
               } as CountMetricExpressionParams,
             ],
           };
+          const config = {
+            ...configuration,
+            metricAlias: 'filebeat-*',
+          };
           const timeFrame = { end: DATES.ten_thousand_plus.max };
           const results = await evaluateRule(
             esClient,
             params,
-            'filebeat-*',
-            timeFieldName,
+            config,
             10000,
             true,
             logger,
@@ -316,12 +357,15 @@ export default function ({ getService }: FtrProviderContext) {
               } as CountMetricExpressionParams,
             ],
           };
+          const config = {
+            ...configuration,
+            metricAlias: 'filebeat-*',
+          };
           const timeFrame = { end: DATES.ten_thousand_plus.max };
           const results = await evaluateRule(
             esClient,
             params,
-            'filebeat-*',
-            timeFieldName,
+            config,
             10000,
             true,
             logger,
@@ -396,12 +440,15 @@ export default function ({ getService }: FtrProviderContext) {
               } as CountMetricExpressionParams,
             ],
           };
+          const config = {
+            ...configuration,
+            metricAlias: 'filebeat-*',
+          };
           const timeFrame = { end: DATES.ten_thousand_plus.max };
           const results = await evaluateRule(
             esClient,
             params,
-            'filebeat-*',
-            timeFieldName,
+            config,
             10000,
             true,
             logger,
@@ -461,8 +508,7 @@ export default function ({ getService }: FtrProviderContext) {
           const results = await evaluateRule(
             esClient,
             params,
-            dataViewIndexPattern,
-            timeFieldName,
+            configuration,
             10000,
             true,
             logger,
@@ -502,8 +548,7 @@ export default function ({ getService }: FtrProviderContext) {
           const results = await evaluateRule(
             esClient,
             params,
-            dataViewIndexPattern,
-            timeFieldName,
+            configuration,
             10000,
             true,
             logger,
@@ -558,8 +603,7 @@ export default function ({ getService }: FtrProviderContext) {
             const results = await evaluateRule(
               esClient,
               params,
-              dataViewIndexPattern,
-              timeFieldName,
+              configuration,
               10000,
               true,
               logger,
@@ -613,8 +657,7 @@ export default function ({ getService }: FtrProviderContext) {
             const results = await evaluateRule(
               esClient,
               params,
-              dataViewIndexPattern,
-              timeFieldName,
+              configuration,
               10000,
               true,
               logger,
@@ -721,8 +764,7 @@ export default function ({ getService }: FtrProviderContext) {
           const results = await evaluateRule(
             esClient,
             params,
-            dataViewIndexPattern,
-            timeFieldName,
+            configuration,
             10000,
             true,
             logger,
@@ -773,8 +815,7 @@ export default function ({ getService }: FtrProviderContext) {
           const results = await evaluateRule(
             esClient,
             params,
-            dataViewIndexPattern,
-            timeFieldName,
+            configuration,
             10000,
             true,
             logger,
@@ -814,8 +855,7 @@ export default function ({ getService }: FtrProviderContext) {
           const results = await evaluateRule(
             esClient,
             params,
-            dataViewIndexPattern,
-            timeFieldName,
+            configuration,
             10000,
             true,
             logger,
@@ -869,8 +909,7 @@ export default function ({ getService }: FtrProviderContext) {
           const results = await evaluateRule(
             esClient,
             params,
-            dataViewIndexPattern,
-            timeFieldName,
+            configuration,
             10000,
             true,
             logger,
@@ -935,8 +974,7 @@ export default function ({ getService }: FtrProviderContext) {
           const results = await evaluateRule(
             esClient,
             params,
-            dataViewIndexPattern,
-            timeFieldName,
+            configuration,
             10000,
             true,
             logger,
@@ -1004,8 +1042,7 @@ export default function ({ getService }: FtrProviderContext) {
           const results = await evaluateRule(
             esClient,
             params,
-            dataViewIndexPattern,
-            timeFieldName,
+            configuration,
             10000,
             true,
             logger,
@@ -1060,8 +1097,7 @@ export default function ({ getService }: FtrProviderContext) {
           const results = await evaluateRule(
             esClient,
             params,
-            dataViewIndexPattern,
-            timeFieldName,
+            configuration,
             10000,
             true,
             logger,
@@ -1081,8 +1117,7 @@ export default function ({ getService }: FtrProviderContext) {
           const results = await evaluateRule(
             esClient,
             params,
-            dataViewIndexPattern,
-            timeFieldName,
+            configuration,
             10000,
             true,
             logger,
@@ -1161,8 +1196,7 @@ export default function ({ getService }: FtrProviderContext) {
         const results = await evaluateRule(
           esClient,
           params,
-          dataViewIndexPattern,
-          timeFieldName,
+          configuration,
           10000,
           true,
           logger,
@@ -1215,8 +1249,7 @@ export default function ({ getService }: FtrProviderContext) {
           const results = await evaluateRule(
             esClient,
             params,
-            dataViewIndexPattern,
-            timeFieldName,
+            configuration,
             10000,
             true,
             logger,
@@ -1273,8 +1306,7 @@ export default function ({ getService }: FtrProviderContext) {
           const results = await evaluateRule(
             esClient,
             params,
-            dataViewIndexPattern,
-            timeFieldName,
+            configuration,
             10000,
             true,
             logger,
@@ -1342,7 +1374,6 @@ export default function ({ getService }: FtrProviderContext) {
             const searchBody = getElasticsearchMetricQuery(
               getSearchParams(aggType),
               timeframe,
-              timeFieldName,
               100,
               true
             );
@@ -1365,7 +1396,6 @@ export default function ({ getService }: FtrProviderContext) {
           const searchBody = getElasticsearchMetricQuery(
             getSearchParams('avg'),
             timeframe,
-            timeFieldName,
             100,
             true,
             void 0,
@@ -1390,7 +1420,6 @@ export default function ({ getService }: FtrProviderContext) {
             const searchBody = getElasticsearchMetricQuery(
               getSearchParams(aggType),
               timeframe,
-              timeFieldName,
               100,
               true,
               void 0,
@@ -1413,7 +1442,6 @@ export default function ({ getService }: FtrProviderContext) {
           const searchBody = getElasticsearchMetricQuery(
             getSearchParams('avg'),
             timeframe,
-            timeFieldName,
             100,
             true,
             void 0,

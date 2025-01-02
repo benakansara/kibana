@@ -374,10 +374,7 @@ export default ({ getPageObject, getService }: FtrProviderContext) => {
         await dashboard.clickNewDashboard();
 
         // adds lens visualization to dashboard, save and return
-        await lens.createAndAddLensFromDashboard({
-          title: `My lens visualization-${uuidv4()}`,
-          indexPattern: 'log*',
-        });
+        await lens.createAndAddLensFromDashboard({ title: `My lens visualization-${uuidv4()}` });
 
         await dashboard.waitForRenderComplete();
         await dashboard.saveDashboard(myDashboardName);

@@ -71,7 +71,6 @@ describe('ExpressionRow', () => {
           timeWindowSize: [],
         }}
         expression={expression}
-        fields={[]}
       />
     );
 

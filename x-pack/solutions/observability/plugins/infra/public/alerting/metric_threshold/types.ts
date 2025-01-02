@@ -5,8 +5,6 @@
  * 2.0.
  */
 
-import { SerializedSearchSourceFields } from '@kbn/data-plugin/public';
-import { DataView } from '@kbn/data-views-plugin/public';
 import {
   CustomMetricExpressionParams,
   FilterQuery,
@@ -17,7 +15,6 @@ import { MetricsExplorerSeries } from '../../../common/http_api/metrics_explorer
 import { MetricsExplorerOptions } from '../../pages/metrics/metrics_explorer/hooks/use_metrics_explorer_options';
 
 export interface AlertContextMeta {
-  adHocDataViewList: DataView[];
   currentOptions?: Partial<MetricsExplorerOptions>;
   series?: MetricsExplorerSeries;
 }
@@ -75,5 +72,4 @@ export interface AlertParams {
   alertOnNoData?: boolean;
   alertOnGroupDisappear?: boolean;
   shouldDropPartialBuckets?: boolean;
-  searchConfiguration: SerializedSearchSourceFields;
 }

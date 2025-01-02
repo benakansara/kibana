@@ -105,13 +105,6 @@ const mockOptions = {
   isServerless: false,
 };
 
-const ruleDataViewMock = {
-  id: 'rule-data-view-id',
-  title: 'rule-data-view-title',
-  timeFieldName: '@timestamp',
-  getIndexPattern: () => ruleDataViewMock.title,
-};
-
 const setEvaluationResults = (response: Array<Record<string, Evaluation>>) => {
   return jest.requireMock('./lib/evaluate_rule').evaluateRule.mockImplementation(() => response);
 };
@@ -137,12 +130,6 @@ describe('The metric threshold rule type', () => {
       uuid: `uuid-${id}`,
       start: new Date().toISOString(),
     }));
-
-    services.getDataViews.mockImplementation(async () => {
-      return {
-        get: jest.fn().mockResolvedValue(ruleDataViewMock),
-      };
-    });
   });
   afterAll(() => jest.useRealTimers());
 
@@ -912,7 +899,7 @@ describe('The metric threshold rule type', () => {
         stateResult2
       );
       expect(stateResult3.missingGroups).toEqual([{ key: 'b', bucketKey: { groupBy0: 'b' } }]);
-      expect(mockedEvaluateRule.mock.calls[2][9]).toEqual([
+      expect(mockedEvaluateRule.mock.calls[2][8]).toEqual([
         { bucketKey: { groupBy0: 'b' }, key: 'b' },
       ]);
     });
