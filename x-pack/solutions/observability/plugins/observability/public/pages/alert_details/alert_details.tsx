@@ -38,6 +38,7 @@ import { AlertFieldsTable } from '@kbn/alerts-ui-shared/src/alert_fields_table';
 import { dashboardServiceProvider } from '@kbn/response-ops-rule-form/src/common';
 import { css } from '@emotion/react';
 import { omit } from 'lodash';
+import html2canvas from 'html2canvas';
 import { RelatedAlerts } from './components/related_alerts/related_alerts';
 import { AlertDetailsSource } from './types';
 import { SourceBar } from './components';
@@ -61,6 +62,7 @@ import StaleAlert from './components/stale_alert';
 import { RelatedDashboards } from './components/related_dashboards';
 import { getAlertTitle } from '../../utils/format_alert_title';
 import { AlertSubtitle } from './components/alert_subtitle';
+import { ImageAnnotator } from './components/screenshot_annotator';
 
 interface AlertDetailsPathParams {
   alertId: string;
@@ -81,6 +83,8 @@ const RELATED_ALERTS_TAB_ID = 'related_alerts';
 const INVESTIGATION_GUIDE_TAB_ID = 'investigation_guide';
 const ALERT_DETAILS_TAB_URL_STORAGE_KEY = 'tabId';
 const RELATED_DASHBOARDS_TAB_ID = 'related_dashboards';
+const SNAPSHOTS_TAB_ID = 'snapshots';
+
 type TabId =
   | typeof OVERVIEW_TAB_ID
   | typeof METADATA_TAB_ID
@@ -117,6 +121,9 @@ export function AlertDetails() {
   const [alertStatus, setAlertStatus] = useState<AlertStatus>();
   const { euiTheme } = useEuiTheme();
   const [sources, setSources] = useState<AlertDetailsSource[]>();
+
+  const [screenshots, setScreenshots] = useState<any[]>([]);
+
   const [activeTabId, setActiveTabId] = useState<TabId>(() => {
     const searchParams = new URLSearchParams(search);
     const urlTabId = searchParams.get(ALERT_DETAILS_TAB_URL_STORAGE_KEY);
@@ -173,6 +180,11 @@ export function AlertDetails() {
     }
   }, [alertDetail, ruleTypeRegistry]);
 
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem('screenshots') || '[]');
+    setScreenshots(saved);
+  }, []);
+
   useBreadcrumbs(
     [
       {
@@ -194,6 +206,19 @@ export function AlertDetails() {
   const onUntrackAlert = useCallback(() => {
     setAlertStatus(ALERT_STATUS_UNTRACKED);
   }, []);
+
+  const onTakeScreenshot = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      html2canvas(element).then((canvas: any) => {
+        const imgData = canvas.toDataURL('image/png');
+        const existing = JSON.parse(localStorage.getItem('screenshots') || '[]');
+        const updated = [...existing, imgData];
+        localStorage.setItem('screenshots', JSON.stringify(updated));
+        setScreenshots(updated);
+      });
+    }
+  };
 
   useEffect(() => {
     if (!isLoading && !!alertDetail && activeTabId === OVERVIEW_TAB_ID) {
@@ -271,6 +296,7 @@ export function AlertDetails() {
                 rule={rule}
                 timeZone={timeZone}
                 setSources={setSources}
+                onTakeScreenshot={onTakeScreenshot}
               />
               <AlertHistoryChart
                 alert={alertDetail.formatted}
@@ -296,6 +322,25 @@ export function AlertDetails() {
     <EuiPanel hasShadow={false} data-test-subj="metadataTabPanel" paddingSize="none">
       <EuiSpacer size="l" />
       <AlertFieldsTable alert={alertDetail.raw} />
+    </EuiPanel>
+  );
+
+  const snapshotsTab = (
+    <EuiPanel hasShadow={false} data-test-subj="snapshotsTabPanel" paddingSize="none">
+      <EuiSpacer size="l" />
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+        {screenshots.map((src, i) => (
+          <div style={{ width: 500 }}>
+            <ImageAnnotator imageSrc={src} />
+            {/* <EuiImage
+              key={i}
+              src={src}
+              alt={`Screenshot ${i + 1}`}
+              allowFullScreen
+            /> */}
+          </div>
+        ))}
+      </div>
     </EuiPanel>
   );
 
@@ -378,6 +423,14 @@ export function AlertDetails() {
           },
         ]
       : []),
+    {
+      id: SNAPSHOTS_TAB_ID,
+      name: i18n.translate('xpack.observability.alertDetails.tab.snapshotsLabel', {
+        defaultMessage: 'Snapshots',
+      }),
+      'data-test-subj': 'snapshotsTab',
+      content: snapshotsTab,
+    },
   ];
 
   return (
@@ -403,6 +456,7 @@ export function AlertDetails() {
               alertIndex={alertDetail?.raw._index}
               alertStatus={alertStatus}
               onUntrackAlert={onUntrackAlert}
+              onTakeScreenshot={onTakeScreenshot}
             />
           </CasesContext>,
         ],

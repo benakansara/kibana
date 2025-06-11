@@ -8,7 +8,7 @@
 import { pick, orderBy } from 'lodash';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiPanel, EuiTitle } from '@elastic/eui';
+import { EuiButton, EuiFlexGroup, EuiFlexItem, EuiPanel, EuiTitle } from '@elastic/eui';
 import {
   LOG_RATE_ANALYSIS_TYPE,
   type LogRateAnalysisType,
@@ -29,6 +29,7 @@ export interface AlertDetailsLogRateAnalysisProps {
   alert: CustomThresholdAlert;
   dataView: any;
   services: any;
+  onTakeScreenshot: (id: string) => void;
 }
 
 interface SignificantFieldValue {
@@ -38,7 +39,12 @@ interface SignificantFieldValue {
   pValue: number | null;
 }
 
-export function LogRateAnalysis({ alert, dataView, services }: AlertDetailsLogRateAnalysisProps) {
+export function LogRateAnalysis({
+  alert,
+  dataView,
+  services,
+  onTakeScreenshot,
+}: AlertDetailsLogRateAnalysisProps) {
   const {
     observabilityAIAssistant: {
       ObservabilityAIAssistantContextualInsight,
@@ -166,17 +172,35 @@ export function LogRateAnalysis({ alert, dataView, services }: AlertDetailsLogRa
   if (!dataView || !esSearchQuery) return null;
 
   return (
-    <EuiPanel hasBorder={true} data-test-subj="logRateAnalysisAlertDetails">
+    <EuiPanel
+      hasBorder={true}
+      id="logRateAnalysisAlertDetails"
+      data-test-subj="logRateAnalysisAlertDetails"
+    >
       <EuiFlexGroup direction="column" gutterSize="none" responsive={false}>
         <EuiFlexItem grow={false}>
-          <EuiTitle size="xs">
-            <h2>
-              <FormattedMessage
-                id="xpack.observability.customThreshold.alertDetails.logRateAnalysis.sectionTitle"
-                defaultMessage="Log Rate Analysis"
-              />
-            </h2>
-          </EuiTitle>
+          <EuiFlexGroup justifyContent="spaceBetween">
+            <EuiFlexItem grow={false}>
+              <EuiTitle size="xs">
+                <h2>
+                  <FormattedMessage
+                    id="xpack.observability.customThreshold.alertDetails.logRateAnalysis.sectionTitle"
+                    defaultMessage="Log Rate Analysis"
+                  />
+                </h2>
+              </EuiTitle>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButton
+                data-test-subj="o11yLogRateAnalysisTakeScreenshotButton"
+                onClick={() => onTakeScreenshot('logRateAnalysisAlertDetails')}
+              >
+                {i18n.translate('xpack.observability.logRateAnalysis.takeScreenshotButtonLabel', {
+                  defaultMessage: 'Take screenshot',
+                })}
+              </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
         </EuiFlexItem>
         <EuiFlexItem>
           <LogRateAnalysisContent

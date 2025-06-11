@@ -51,10 +51,11 @@ import { generateChartTitleAndTooltip } from './helpers/generate_chart_title_and
 
 interface AppSectionProps {
   alert: CustomThresholdAlert;
+  onTakeScreenshot: (id: string) => void;
 }
 
 // eslint-disable-next-line import/no-default-export
-export default function AlertDetailsAppSection({ alert }: AppSectionProps) {
+export default function AlertDetailsAppSection({ alert, onTakeScreenshot }: AppSectionProps) {
   const services = useKibana().services;
   const {
     charts,
@@ -173,7 +174,7 @@ export default function AlertDetailsAppSection({ alert }: AppSectionProps) {
               </EuiFlexGroup>
               <EuiSpacer size="m" />
               <EuiFlexGroup>
-                <EuiFlexItem style={{ minHeight: 150, minWidth: 160 }} grow={1}>
+                <EuiFlexItem css={{ minHeight: 150, minWidth: 160 }} grow={1}>
                   <Threshold
                     chartProps={chartProps}
                     id={`threshold-${index}`}
@@ -216,7 +217,12 @@ export default function AlertDetailsAppSection({ alert }: AppSectionProps) {
         );
       })}
       {hasLogRateAnalysisLicense && (
-        <LogRateAnalysis alert={alert} dataView={dataView} services={services} />
+        <LogRateAnalysis
+          alert={alert}
+          dataView={dataView}
+          services={services}
+          onTakeScreenshot={onTakeScreenshot}
+        />
       )}
     </EuiFlexGroup>
   );

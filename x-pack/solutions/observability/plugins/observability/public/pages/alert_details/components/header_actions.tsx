@@ -39,6 +39,7 @@ export interface HeaderActionsProps {
   alertIndex?: string;
   alertStatus?: AlertStatus;
   onUntrackAlert: () => void;
+  onTakeScreenshot: (id: string) => void;
 }
 
 export function HeaderActions({
@@ -46,6 +47,7 @@ export function HeaderActions({
   alertIndex,
   alertStatus,
   onUntrackAlert,
+  onTakeScreenshot,
 }: HeaderActionsProps) {
   const { services } = useKibana();
   const {
@@ -118,6 +120,16 @@ export function HeaderActions({
   return (
     <>
       <EuiFlexGroup direction="row" gutterSize="s" justifyContent="flexEnd">
+        <EuiFlexItem grow={false}>
+          <EuiButton
+            data-test-subj="o11yHeaderActionsTakeScreenshotButton"
+            onClick={() => onTakeScreenshot('kibana-body')}
+          >
+            {i18n.translate('xpack.observability.headerActions.takeScreenshotButtonLabel', {
+              defaultMessage: 'Take screenshot',
+            })}
+          </EuiButton>
+        </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiButton
             fill
