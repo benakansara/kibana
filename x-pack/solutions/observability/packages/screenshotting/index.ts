@@ -6,6 +6,7 @@
  */
 
 export { captureScreenshot } from './src';
+export { takeScreenshot } from './src';
 export { saveScreenshot } from './src';
 export { CaptureScreenshotExample } from './examples';
 export { type CaptureScreenshotOptions, type SaveScreenshotOptions } from './src';

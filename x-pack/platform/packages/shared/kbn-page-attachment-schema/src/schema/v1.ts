@@ -30,6 +30,7 @@ export const pageAttachmentPersistedStateSchema = z.object({
      */
     iconType: z.string().optional(),
   }),
+  fileId: z.string().optional(),
   /**
    * Optional screen context for the page. A plain text description that
    * can be provided to an LLM to generate a summary or perform analysis

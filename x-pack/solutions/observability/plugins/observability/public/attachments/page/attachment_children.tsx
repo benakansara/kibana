@@ -7,7 +7,16 @@
 
 import React, { useMemo, useCallback } from 'react';
 import { i18n } from '@kbn/i18n';
-import { EuiLink, EuiCallOut, EuiText, EuiFlexGroup, EuiFlexItem, EuiIcon } from '@elastic/eui';
+import {
+  EuiLink,
+  EuiCallOut,
+  EuiText,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiIcon,
+  EuiSpacer,
+  EuiImage,
+} from '@elastic/eui';
 import { type PersistableStateAttachmentViewProps } from '@kbn/cases-plugin/public/client/attachment_framework/types';
 import type { PageAttachmentPersistedState } from '@kbn/page-attachment-schema';
 import { useKibana } from '../../utils/kibana_react';
@@ -29,8 +38,10 @@ export function PageAttachmentChildren({
       notifications: { toasts },
     },
   } = useKibana();
-  const { url } = pageState;
+  const { url, fileId } = pageState;
   const label = url?.label;
+  const services = useKibana().services;
+  const { files } = services;
 
   const href = useMemo(() => {
     try {
@@ -103,6 +114,13 @@ export function PageAttachmentChildren({
     );
   }
 
+  const screenshot = fileId
+    ? files.filesClientFactory.asScoped('observabilityFilesCases').getDownloadHref({
+        id: fileId,
+        fileKind: 'observabilityFilesCases',
+      })
+    : undefined;
+
   return (
     <>
       <EuiFlexGroup gutterSize="xs" responsive={false} alignItems="center">
@@ -116,6 +134,14 @@ export function PageAttachmentChildren({
             <EuiText size="m">{label}</EuiText>
           </EuiLink>
         </EuiFlexItem>
+      </EuiFlexGroup>
+      <EuiFlexGroup>
+        {screenshot && fileId && (
+          <EuiFlexItem grow={false}>
+            <EuiSpacer size="m" />
+            <EuiImage src={screenshot} alt="screenshot" allowFullScreen />
+          </EuiFlexItem>
+        )}
       </EuiFlexGroup>
     </>
   );

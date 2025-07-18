@@ -68,6 +68,7 @@ import { EmbeddableEnhancedPluginStart } from '@kbn/embeddable-enhanced-plugin/p
 import type { FieldFormatsStart } from '@kbn/field-formats-plugin/public';
 import type { LicensingPluginStart } from '@kbn/licensing-plugin/public';
 import type { SettingsStart } from '@kbn/core-ui-settings-browser';
+import { FilesSetup, FilesStart } from '@kbn/files-plugin/public';
 import { registerSyntheticsEmbeddables } from './apps/embeddables/register_embeddables';
 import { kibanaService } from './utils/kibana_service';
 import { PLUGIN } from '../common/constants/plugin';
@@ -94,6 +95,7 @@ export interface ClientPluginsSetup {
   embeddable: EmbeddableSetup;
   serverless?: ServerlessPluginSetup;
   uiActions: UiActionsSetup;
+  files: FilesSetup;
 }
 
 export interface ClientPluginsStart {
@@ -133,6 +135,7 @@ export interface ClientPluginsStart {
   charts: ChartsPluginStart;
   uiActions: UiActionsStart;
   fieldsMetadata: FieldsMetadataPublicStart;
+  files: FilesStart;
   settings: SettingsStart;
 }
 

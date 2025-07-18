@@ -16,6 +16,7 @@ export const saveScreenshot = async (
   | {
       ok: true;
       size: number;
+      fileId: string;
     }
   | undefined
 > => {
@@ -48,7 +49,10 @@ export const saveScreenshot = async (
         contentType: 'image/png',
       });
 
-      return uploadResult;
+      return {
+        ...uploadResult,
+        fileId: createResult.file.id,
+      };
     } catch (err) {
       await filesClient.bulkDelete({
         ids: [createResult.file.id],

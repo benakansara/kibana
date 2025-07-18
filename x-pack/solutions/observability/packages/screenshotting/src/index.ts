@@ -7,4 +7,5 @@
 
 export * from './capture_screenshot/capture';
 export * from './save_screenshot/save';
+export * from './capture_screenshot/capture_current_page';
 export { type CaptureScreenshotOptions, type SaveScreenshotOptions } from './types';

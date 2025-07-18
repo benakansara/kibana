@@ -41,7 +41,8 @@
       "unifiedSearch",
       "presentationUtil",
       "charts",
-      "fieldsMetadata"
+      "fieldsMetadata",
+      "files"
     ],
     "optionalPlugins": [
       "cases",

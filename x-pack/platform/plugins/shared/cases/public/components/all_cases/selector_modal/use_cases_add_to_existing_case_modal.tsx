@@ -73,8 +73,17 @@ export const useCasesAddToExistingCaseModal = ({
   const handleOnRowClick = useCallback(
     async (
       theCase: CaseUI | undefined,
-      getAttachments?: ({ theCase }: { theCase?: CaseUI }) => CaseAttachmentsWithoutOwner
+      getAttachments?: ({ theCase }: { theCase?: CaseUI }) => CaseAttachmentsWithoutOwner,
+      getScreenshot?: ({ theCase }: { theCase?: CaseUI }) => Promise<
+        | {
+            ok: true;
+            size: number;
+            fileId: string;
+          }
+        | undefined
+      >
     ) => {
+      const screenshotRes = await getScreenshot?.({ theCase });
       const attachments = getAttachments?.({ theCase }) ?? [];
 
       // when the case is undefined in the modal
@@ -96,6 +105,12 @@ export const useCasesAddToExistingCaseModal = ({
         }
 
         startTransaction({ appId, attachments });
+
+        if (attachments[0].type === 'persistableState') {
+          if (theCase) {
+            attachments[0].persistableStateAttachmentState.fileId = screenshotRes?.fileId ?? '';
+          }
+        }
 
         await createAttachments({
           caseId: theCase.id,
@@ -134,8 +149,17 @@ export const useCasesAddToExistingCaseModal = ({
   const openModal = useCallback(
     ({
       getAttachments,
+      getScreenshot,
     }: {
       getAttachments?: ({ theCase }: { theCase?: CaseUI }) => CaseAttachmentsWithoutOwner;
+      getScreenshot?: ({ theCase }: { theCase?: CaseUI }) => Promise<
+        | {
+            ok: true;
+            size: number;
+            fileId: string;
+          }
+        | undefined
+      >;
     } = {}) => {
       dispatch({
         type: CasesContextStoreActionsList.OPEN_ADD_TO_CASE_MODAL,
@@ -143,7 +167,7 @@ export const useCasesAddToExistingCaseModal = ({
           hiddenStatuses: [CaseStatuses.closed],
           onCreateCaseClicked,
           onRowClick: (theCase?: CaseUI) => {
-            handleOnRowClick(theCase, getAttachments);
+            handleOnRowClick(theCase, getAttachments, getScreenshot);
           },
           onClose: (theCase?: CaseUI, isCreateCase?: boolean) => {
             closeModal();

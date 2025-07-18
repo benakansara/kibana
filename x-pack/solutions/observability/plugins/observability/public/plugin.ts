@@ -79,6 +79,7 @@ import type { StreamsPluginStart, StreamsPluginSetup } from '@kbn/streams-plugin
 import { FieldsMetadataPublicStart } from '@kbn/fields-metadata-plugin/public';
 import { Start as InspectorPluginStart } from '@kbn/inspector-plugin/public';
 import { LogsDataAccessPluginStart } from '@kbn/logs-data-access-plugin/public';
+import { FilesSetup, FilesStart } from '@kbn/files-plugin/public';
 import { observabilityAppId, observabilityFeatureId } from '../common';
 import {
   ALERTS_PATH,
@@ -140,6 +141,7 @@ export interface ObservabilityPublicPluginsSetup {
   serverless?: ServerlessPluginSetup;
   presentationUtil?: PresentationUtilPluginStart;
   streams?: StreamsPluginSetup;
+  files: FilesSetup;
   cases?: CasesPublicSetup;
 }
 export interface ObservabilityPublicPluginsStart {
@@ -183,6 +185,7 @@ export interface ObservabilityPublicPluginsStart {
   streams?: StreamsPluginStart;
   fieldsMetadata: FieldsMetadataPublicStart;
   inspector: InspectorPluginStart;
+  files: FilesStart;
 }
 export type ObservabilityPublicStart = ReturnType<Plugin['start']>;
 
