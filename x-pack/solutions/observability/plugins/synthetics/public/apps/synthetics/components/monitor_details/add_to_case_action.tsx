@@ -13,6 +13,7 @@ import { i18n } from '@kbn/i18n';
 import type { CaseAttachmentsWithoutOwner } from '@kbn/cases-plugin/public';
 import type { PageAttachmentPersistedState } from '@kbn/page-attachment-schema';
 import { type CasesPermissions } from '@kbn/cases-plugin/common';
+import { SaveScreenshotOptions, saveScreenshot, takeScreenshot } from '@kbn/screenshotting';
 import { ClientPluginsStart } from '../../../../plugin';
 import { useSelectedMonitor } from './hooks/use_selected_monitor';
 import { useGetUrlParams, useMonitorDetailLocator } from '../../hooks';
@@ -116,8 +117,41 @@ function AddToCaseButtonContent() {
           },
         ] as CaseAttachmentsWithoutOwner;
       },
+      getScreenshot: async ({
+        theCase,
+      }): Promise<
+        | {
+            ok: true;
+            size: number;
+            fileId: string;
+          }
+        | undefined
+      > => {
+        const captureResult = await takeScreenshot();
+
+        if (theCase && redirectUrl) {
+          if (captureResult?.blob) {
+            const options: SaveScreenshotOptions = {
+              caseId: theCase.id,
+              owner: ['observability'],
+              dependencies: {
+                filesClient: services.files.filesClientFactory.asScoped('observabilityFilesCases'),
+              },
+            };
+
+            const res = await saveScreenshot(redirectUrl, captureResult?.blob, { ...options });
+            return res;
+          }
+        }
+      },
     });
-  }, [casesModal, notifications.toasts, monitor?.name, redirectUrl]);
+  }, [
+    casesModal,
+    notifications.toasts,
+    monitor?.name,
+    redirectUrl,
+    services.files.filesClientFactory,
+  ]);
 
   return (
     <EuiContextMenuItem

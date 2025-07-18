@@ -7,7 +7,6 @@
 
 import { EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
 import React, { useCallback, useEffect } from 'react';
-import { useFilesContext } from '@kbn/shared-ux-file-context';
 import { CASE_VIEW_PAGE_TABS } from '../../../common/types';
 import { useUrlParams } from '../../common/navigation';
 import { useCasesContext } from '../cases_context/use_cases_context';
@@ -44,10 +43,9 @@ export const CaseViewPage = React.memo<CaseViewPageProps>(
     onAlertsTableLoaded,
     renderAlertsTable,
   }) => {
-    const { features, owner } = useCasesContext();
+    const { features } = useCasesContext();
     const { urlParams } = useUrlParams();
     const refreshCaseViewPage = useRefreshCaseViewPage();
-    const { client: filesClient } = useFilesContext();
 
     useCasesTitleBreadcrumbs(caseData.title);
 
@@ -138,13 +136,6 @@ export const CaseViewPage = React.memo<CaseViewPageProps>(
             <CaseViewSimilarCases caseData={caseData} />
           )}
         </EuiFlexGroup>
-        {/* <CaptureScreenshotExample options={
-          {
-            caseId: caseData.id,
-            owner: owner,
-            dependencies: { filesClient }
-          }
-        } /> */}
       </>
     );
   }
