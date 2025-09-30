@@ -52,8 +52,6 @@ export const casesQueriesKeys = {
   alertFeatureIds: (alertIds: string[]) =>
     [...casesQueriesKeys.alerts, 'features', alertIds] as const,
   configuration: (params: unknown) => [...casesQueriesKeys.all, 'configuration', params] as const,
-  caseSummary: (id: string, connectorId: string) =>
-    [...casesQueriesKeys.case(id), 'connectorId', connectorId] as const,
 };
 
 export const casesMutationsKeys = {
@@ -71,10 +69,6 @@ export const casesMutationsKeys = {
   postObservable: ['post-observable'] as const,
   patchObservable: ['patch-observable'] as const,
   deleteObservable: ['delete-observable'] as const,
-};
-
-export const inferenceKeys = {
-  getConnectors: () => ['get-inference-connectors'] as const,
 };
 
 const DEFAULT_SEARCH_FIELDS = ['title', 'description', 'incremental_id.text'];
