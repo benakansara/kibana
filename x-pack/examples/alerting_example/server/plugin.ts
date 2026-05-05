@@ -16,6 +16,7 @@ import { ALERTING_FEATURE_ID } from '@kbn/alerting-plugin/common';
 import { ruleType as alwaysFiringRule } from './rule_types/always_firing';
 import { ruleType as peopleInSpaceRule } from './rule_types/astros';
 import { ruleType as patternRule } from './rule_types/pattern';
+import { ruleType as cpuUsagePerHostRule } from './rule_types/cpu_usage_per_host';
 // can't import static code from another plugin to support examples functional test
 const INDEX_THRESHOLD_ID = '.index-threshold';
 import { ALERTING_EXAMPLE_APP_ID } from '../common/constants';
@@ -31,6 +32,7 @@ export class AlertingExamplePlugin implements Plugin<void, void, AlertingExample
     alerting.registerType(alwaysFiringRule);
     alerting.registerType(peopleInSpaceRule);
     alerting.registerType(patternRule);
+    alerting.registerType(cpuUsagePerHostRule);
 
     features.registerKibanaFeature({
       id: ALERTING_EXAMPLE_APP_ID,
@@ -55,6 +57,10 @@ export class AlertingExamplePlugin implements Plugin<void, void, AlertingExample
           ruleTypeId: INDEX_THRESHOLD_ID,
           consumers: [ALERTING_EXAMPLE_APP_ID, ALERTING_FEATURE_ID],
         },
+        {
+          ruleTypeId: cpuUsagePerHostRule.id,
+          consumers: [ALERTING_EXAMPLE_APP_ID, ALERTING_FEATURE_ID],
+        },
       ],
       privileges: {
         all: {
@@ -73,6 +79,10 @@ export class AlertingExamplePlugin implements Plugin<void, void, AlertingExample
                   ruleTypeId: INDEX_THRESHOLD_ID,
                   consumers: [ALERTING_EXAMPLE_APP_ID, ALERTING_FEATURE_ID],
                 },
+                {
+                  ruleTypeId: cpuUsagePerHostRule.id,
+                  consumers: [ALERTING_EXAMPLE_APP_ID, ALERTING_FEATURE_ID],
+                },
               ],
             },
             alert: {
@@ -87,6 +97,10 @@ export class AlertingExamplePlugin implements Plugin<void, void, AlertingExample
                 },
                 {
                   ruleTypeId: INDEX_THRESHOLD_ID,
+                  consumers: [ALERTING_EXAMPLE_APP_ID, ALERTING_FEATURE_ID],
+                },
+                {
+                  ruleTypeId: cpuUsagePerHostRule.id,
                   consumers: [ALERTING_EXAMPLE_APP_ID, ALERTING_FEATURE_ID],
                 },
               ],
@@ -117,6 +131,10 @@ export class AlertingExamplePlugin implements Plugin<void, void, AlertingExample
                   ruleTypeId: INDEX_THRESHOLD_ID,
                   consumers: [ALERTING_EXAMPLE_APP_ID, ALERTING_FEATURE_ID],
                 },
+                {
+                  ruleTypeId: cpuUsagePerHostRule.id,
+                  consumers: [ALERTING_EXAMPLE_APP_ID, ALERTING_FEATURE_ID],
+                },
               ],
             },
             alert: {
@@ -131,6 +149,10 @@ export class AlertingExamplePlugin implements Plugin<void, void, AlertingExample
                 },
                 {
                   ruleTypeId: INDEX_THRESHOLD_ID,
+                  consumers: [ALERTING_EXAMPLE_APP_ID, ALERTING_FEATURE_ID],
+                },
+                {
+                  ruleTypeId: cpuUsagePerHostRule.id,
                   consumers: [ALERTING_EXAMPLE_APP_ID, ALERTING_FEATURE_ID],
                 },
               ],
